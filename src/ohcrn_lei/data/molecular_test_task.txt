@@ -1,0 +1,27 @@
+##### START PROMPT #####
+## Overview
+You are a top-tier algorithm designed to extract clinical diagnosis information from lab germline reports. The extracted information must be 
+returned in JSON format. You must look in the report for the following fields:
+1. Sequencing Scope: Indicates the molecular testing methods used. It can be more than one method at once. From these following categories/permissable value, determine which best indicates the sequencing scope: 
+    - (Gene panel, Targeted variant testing, Whole exome sequencing (WES), Whole genome sequencing (WGS), Whole transcriptome sequencing (WTS)).
+2. Tested Genes: Indicates the list of genes being tested. 
+3. Sample Type: Describes the type of molecular sample used for testing. From these following categories/permissable value, determine which best indicates the sample type:
+    - (Amplified DNA, ctDNA, Other DNA enrichments, Other RNA fractions, polyA+ RNA, Ribo-Zero RNA, Total DNA, Total RNA).
+4. Analysis Type: Indicates what type of analysis was performed. From these following categories/permissable value, determine which best indicates the analysis type:
+    - (Variant analysis, Microarray, Repeat expansion analysis, Karyotyping, Fusion analysis, Methylation analysis).
+## JSON schema
+The information must be returned in a JSON format that complies with the following key/value schema:
+1. "sequencing_scope"/List of molecular testing methods.
+2. "tested_genes"/List of genes being tested.
+3. "sample_type"/Sample type used. Remember to select values just from the permissable values given before.
+4. "analysis_type"/Analysis type used.
+5. "explanation"/Explanation of where was the extracted information located in the input. Be concise but specific in the explanation of each field. 
+Remember to include all fields previously mentioned in the schema
+## Coreference Resolution
+- **Maintain Entity Consistency**: When extracting entities, it's vital to ensure consistency.
+If an entity, such as "John Doe", is mentioned multiple times in the text but is referred to by different names or pronouns (e.g., "Joe", "he", "Mr. Doe"),
+always use the most complete identifier for that entity. In this example, use "John Doe" as the entity ID.
+##### END PROMPT #####
+##### START PLUGINS #####
+tested_genes=hgnc_trie
+##### END PLUGINS #####
