@@ -2,10 +2,15 @@ import importlib.resources
 import re
 import os
 import sys
-
 from ohcrn_lei.task import Task
 
-def load_task(taskname):
+def load_task(taskname, print_usage) -> Task:
+  """
+  Load a task by name. The name can either be
+  an internal task (stored in package data), or an
+  external file
+  """
+
   taskData = ""
   #check if task refers to an external task file and if so, load it
   if re.search(r'\.txt$',taskname):
@@ -13,7 +18,8 @@ def load_task(taskname):
       with open(taskname, 'r', encoding='utf-8') as tin:
         taskData = tin.read()
     except Exception as e:
-      print(f"Error: Task argument looks like a file, but that file cannot be found or read: {e}")
+      print(f"ERROR: Task argument looks like a file, but that file cannot be found or read: {e}")
+      print_usage()
       sys.exit(os.EX_NOTFOUND)
     
   #otherwise try to load interal task file
@@ -24,20 +30,31 @@ def load_task(taskname):
       if taskname in tf.name:
         taskData = tf.read_text()
 
-  if taskData:
-    task_sections = split_sections(taskData)
-  else:
-    print(f"Error: Unknown task {task}")
+  if not taskData:
+    print(f"ERROR: Unknown task {taskname}")
+    print_usage()
     sys.exit(os.EX_USAGE)
 
-  # task = Task(task_sections['PROMPT'])
+  try:
+    task_sections = split_sections(taskData)
+  except ValueError as e:
+      print(f"ERROR: Invalid task file format: {e}")
+      sys.exit(os.EX_NOTFOUND)
 
-  # if 'PLUGINS' in task_sections:
-  #   for line in iter(task_sections['PLUGINS'].splitlines()):
-  #     line.split("=")
+  task = Task(task_sections['PROMPT'])
+
+  if 'PLUGINS' in task_sections:
+    plugins = {}
+    for line in task_sections['PLUGINS'].splitlines():
+      fields=line.split("=")
+      if len(fields) != 2:
+        print(f"ERROR: Invalid plugin definition {line} in task {taskname}")
+        sys.exit(os.EX_USAGE)
+      # out.update({'key':fields[0], 'op':fields[1]})
+      plugins[fields[0]] = fields[1]
+    task.set_plugins(plugins)
      
-
-  return task_sections
+  return task
 
 
 def split_sections(contents):
