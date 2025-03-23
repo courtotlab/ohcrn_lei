@@ -1,5 +1,5 @@
 import re
-from mavehgvs.patterns import protein as prot_regex
+# from mavehgvs.patterns import protein as prot_regex
 from enum import Enum
 
 def get_coding_genomic_protein_changes(text:str)->dict:

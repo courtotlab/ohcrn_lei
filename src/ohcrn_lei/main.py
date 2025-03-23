@@ -37,9 +37,7 @@ def start() -> None:
     sys.exit(os.EX_IOERR)
 
   # Wrap the print_usage call in a lambda function
-  print_usage = lambda: parser.print_usage()
-
-  task = task_parser.load_task(args.task, print_usage)
+  task = task_parser.load_task(args.task, lambda: parser.print_usage())
   output = task.run(args.filename)
 
   if args.outfile == "-" or args.outfile == "stdout":
@@ -53,7 +51,6 @@ def start() -> None:
       sys.exit(os.EX_IOERR)
     else:
       print(f"Output successfully written to {args.outfile}")
-
 
     
 if __name__ == '__main__':
