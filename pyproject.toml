@@ -23,3 +23,11 @@ ohcrn-lei = "ohcrn_lei:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.2",
+]
+
+[tool.ruff]
+indent-width = 2
