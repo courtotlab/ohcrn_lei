@@ -5,18 +5,38 @@ from ohcrn_lei import llm_calls
 
 
 class Task:
+  """
+  Task performs an extraction task. It gets configured with an
+  LLM prompt and option al plugins.
+
+  run() executes the task on a given input file.
+  """
+
   def __init__(self, prompt: str):
+    """
+    Constructor to create a new task with an LLM prompt.
+    """
     self.prompt = prompt
     self.plutings = None
 
   def set_plugins(self, plugins: dict):
+    """
+    Sets the plugins for this task. Plugins are formatted
+    as dicts with have the desired json key as keys and
+    the desired operations as values.
+    """
     self.plugins = plugins
 
-  # print string representation
+  # print string representation override
   def __str__(self):
     return "PROMPT:\n" + self.prompt + "\nPLUGINS:\n" + str(self.plugins)
 
   def run(self, inputfile: str, chunk_size=2) -> dict:
+    """
+    Run the task on the given input file. If the file has multiple
+    pages use the chunk size to determine how many pages are processed
+    in a single batch.
+    """
     try:
       with open(inputfile, "r", encoding="utf-8") as instream:
         text = instream.read()
@@ -42,6 +62,8 @@ class Task:
       llm_results = llm_calls.call_gpt_api(self.prompt, query_msg, "gpt-4o")
       # Add to llm dict
       full_llm_results["Pages " + str(i + 1) + "-" + str(i + chunk_size)] = llm_results
+
+      #TODO: Run plugins
 
       i += chunk_size
 
