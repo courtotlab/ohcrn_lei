@@ -110,7 +110,7 @@ class Trie:
         node.children[letter] = child_node
 
       # After processing children, we expect a closing bracket
-      if s[index] != "]":
+      if index >= len(s) or s[index] != "]":
         raise ValueError("Expected ']' at position {}".format(index))
       index += 1  # skip ']'
       return node
