@@ -1,8 +1,10 @@
 import os
 import sys
+from typing import List
 
 from ohcrn_lei import llm_calls
 from ohcrn_lei.extractHGNCSymbols import find_HGNC_symbols
+from ohcrn_lei.pdf_to_text import convert_pdf_to_str_list
 from ohcrn_lei.regex_utils import get_coding_changes
 from ohcrn_lei.regex_utils import get_genomic_changes
 from ohcrn_lei.regex_utils import get_protein_changes
@@ -37,28 +39,24 @@ class Task:
   def __str__(self):
     return "PROMPT:\n" + self.prompt + "\nPLUGINS:\n" + str(self.plugins)
 
-  def run(self, inputfile: str, chunk_size=2, llm_mock=False) -> dict:
+  def run(self, inputfile: str, chunk_size=2, no_ocr=False, llm_mock=False) -> dict:
     """
     Run the task on the given input file. If the file has multiple
     pages use the chunk size to determine how many pages are processed
     in a single batch.
     """
-    # TODO: add OCR
-    try:
-      with open(inputfile, "r", encoding="utf-8") as instream:
-        text = instream.read()
-    except Exception as e:
-      print(f"ERROR: Unable to read file {inputfile}: {e}")
-      sys.exit(os.EX_IOERR)
-
-    # simulate multiple pages for plain text input
-    all_text = [text]
+    if no_ocr:
+      all_text = self.convert_txt_to_str_list(inputfile)
+    else:
+      print("Performing OCR")
+      all_text = convert_pdf_to_str_list(inputfile)
+      # ocr_cleanup()
 
     i = 0
     full_results = {}
 
     while i <= len(all_text) - (chunk_size - 1):
-      print("Sending request for pages", i, "to", i + chunk_size - 1)
+      print("Processing pages", i, "to", i + chunk_size - 1)
       pages_text = " ".join(all_text[i : i + chunk_size])
 
       # Prepare query
@@ -66,6 +64,7 @@ class Task:
         "Use the given format to extract information from the following input: "
         + pages_text
       )
+      print(" - Running LLM request")
       # Call the API to get JSON (dict) with the requested fields in the prompt
       llm_results = llm_calls.call_gpt_api(self.prompt, query_msg, "gpt-4o", llm_mock)
       # Add to llm dict
@@ -74,6 +73,7 @@ class Task:
 
       # Run plugins
       if self.plugins:
+        print(" - Running plugins")
         for path, plugin_name in self.plugins.items():
           match plugin_name:
             case "trie_hgnc":
@@ -96,3 +96,13 @@ class Task:
       i += chunk_size
 
     return full_results
+
+  def convert_txt_to_str_list(self, inputfile: str) -> List[str]:
+    try:
+      with open(inputfile, "r", encoding="utf-8") as instream:
+        text = instream.read()
+    except Exception as e:
+      print(f"ERROR: Unable to read file {inputfile}: {e}")
+      sys.exit(os.EX_IOERR)
+    # simulate multiple pages for plain text input
+    return [text]

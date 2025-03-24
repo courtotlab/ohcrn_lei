@@ -35,9 +35,21 @@ def start() -> None:
   args = parser.parse_args()
 
   # Output the parsed arguments
-  print("OCR Disabled:" if args.no_ocr else "OCR Enabled")
-  print("Task set to:", args.task)
   print("Processing file:", args.filename)
+  print(" * Task:", args.task)
+  if args.mock_LLM:
+    print(" * Using mock LLM output")
+
+  # check if the file is a text file, if so, enable no-ocr mode
+  if args.filename.endswith(".txt"):
+    args.no_ocr = True
+
+  if args.no_ocr:
+    # check that the file isn't a PDF file
+    if args.filename.endswith(".pdf"):
+      print("When using --no-ocr, the input file cannot be a PDF!")
+      sys.exit(os.EX_USAGE)
+    print(" * OCR disabled")
 
   # check that file can be read
   if not os.access(args.filename, os.R_OK):
@@ -46,7 +58,9 @@ def start() -> None:
 
   # Wrap the print_usage call in a lambda function
   task = task_parser.load_task(args.task, lambda: parser.print_usage())
-  output = task.run(args.filename, chunk_size=2, llm_mock=args.mock_LLM)
+  output = task.run(
+    args.filename, chunk_size=2, no_ocr=args.no_ocr, llm_mock=args.mock_LLM
+  )
 
   if args.outfile == "-" or args.outfile == "stdout":
     print(output)
