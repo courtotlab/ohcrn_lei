@@ -2,7 +2,7 @@ import os
 import sys
 from typing import List
 
-from ohcrn_lei import llm_calls
+from ohcrn_lei.llm_calls import call_gpt_api
 from ohcrn_lei.extractHGNCSymbols import find_HGNC_symbols
 from ohcrn_lei.pdf_to_text import convert_pdf_to_str_list
 from ohcrn_lei.regex_utils import get_coding_changes
@@ -50,7 +50,6 @@ class Task:
     else:
       print("Performing OCR")
       all_text = convert_pdf_to_str_list(inputfile)
-      # ocr_cleanup()
 
     i = 0
     full_results = {}
@@ -66,7 +65,7 @@ class Task:
       )
       print(" - Running LLM request")
       # Call the API to get JSON (dict) with the requested fields in the prompt
-      llm_results = llm_calls.call_gpt_api(self.prompt, query_msg, "gpt-4o", llm_mock)
+      llm_results = call_gpt_api(self.prompt, query_msg, "gpt-4o", llm_mock)
       # Add to llm dict
       page_key = "Pages " + str(i + 1) + "-" + str(i + chunk_size)
       full_results[page_key] = llm_results

@@ -23,7 +23,7 @@ def load_task(taskname, print_usage) -> Task:
         f"ERROR: Task argument looks like a file, but that file cannot be found or read: {e}"
       )
       print_usage()
-      sys.exit(os.EX_NOTFOUND)
+      sys.exit(os.EX_IOERR)
 
   # otherwise try to load interal task file
   else:
@@ -44,7 +44,11 @@ def load_task(taskname, print_usage) -> Task:
     task_sections = split_sections(taskData)
   except ValueError as e:
     print(f"ERROR: Invalid task file format: {e}")
-    sys.exit(os.EX_NOTFOUND)
+    sys.exit(os.EX_USAGE)
+
+  if "PROMPT" not in task_sections:
+    print("ERROR: Invalid task file format: No prompt section.")
+    sys.exit(os.EX_USAGE)
 
   task = Task(task_sections["PROMPT"])
 
