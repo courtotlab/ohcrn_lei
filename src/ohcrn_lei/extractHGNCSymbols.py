@@ -1,17 +1,18 @@
+from typing import List
 import requests
 import os
 import re
 from ohcrn_lei.trieSearch import Trie
 
 
-def filterAliases(symbols):
+def filterAliases(symbols: List[str]) -> List[str]:
   """
   Only allow aliases that have at least one uppercase character followed by a number and a length of at least 3
   """
   return [s for s in symbols if len(s) > 2 and re.search(r"[A-Z][0-9]", s)]
 
 
-def parse_HGNC_from_URL(hgnc_url):
+def parse_HGNC_from_URL(hgnc_url: str) -> Trie:
   """
   Read HGNC definitions file, pull all gene symbols from it
   and feed them into a search Trie.
@@ -48,10 +49,7 @@ def parse_HGNC_from_URL(hgnc_url):
   return trie
 
 
-def load_or_build_Trie(
-  trieFile="hgncTrie.txt",
-  hgnc_url="https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/non_alt_loci_set.txt",
-):
+def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
   """
   Trie to load a serialized search Trie for HGNC gene symbols from a given cache file.
   If it doesn't exist, build a new Trie from the HGNC source on the internet,
@@ -81,7 +79,7 @@ def load_or_build_Trie(
   return trie
 
 
-def eliminate_submatches(matches):
+def eliminate_submatches(matches: dict[int, str]) -> dict[int, str]:
   """
   Find all the submatches in the list of matches and remove them.
   E.g. "The gene is CHEK2." matches both "CHEK2" and "HE", but "HE" is
@@ -103,7 +101,7 @@ def eliminate_submatches(matches):
   return cleanMatches
 
 
-def find_HGNC_symbols(text):
+def find_HGNC_symbols(text: str) -> List[str]:
   """
   Finds all HGNC gene symbols in a given piece of text
   """
@@ -119,36 +117,3 @@ def find_HGNC_symbols(text):
   # return(cleanMatches)
   out = [symbol for (idx, symbol) in cleanMatches]
   return out
-
-
-def test():
-  # txtFile = "../input_docs/ocr_out/SickKids.txt"
-  # txtFile = "../input_docs/manual_text/SickKids.txt"
-  txtFile = "../input_docs/manual_text/special/SickKidsGenes.txt"
-  try:
-    with open(txtFile, "r", encoding="utf-8") as infile:
-      text = infile.read()
-      print("Text file read successfully.")
-  except Exception as e:
-    print(f"Error while reading file {e}")
-
-  # print(text)
-
-  matches = find_HGNC_symbols(text)
-  # remove redundant entries
-  matches = set(matches)
-  # print result
-  print("\n\nFound %d matches:" % (len(matches)))
-  print(sorted(matches))
-
-  truth = set([s for line in text.split("\n") for s in line.split(" ")])
-
-  print("\n\n Missing:")
-  print(truth - matches)
-
-  print("\n\n Surplus:")
-  print(matches - truth)
-
-
-if __name__ == "__main__":
-  test()

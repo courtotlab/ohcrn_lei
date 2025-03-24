@@ -58,12 +58,3 @@ def convert_pdf_to_str_list(pdf_file_path: str) -> list:
   doc.close()
 
   return pages_txt
-
-
-def test():
-  text = convert_pdf_to_text("../input_docs/CHEO Redacted - VUS.pdf")
-  print(text)
-
-
-if __name__ == "__main__":
-  test()

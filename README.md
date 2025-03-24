@@ -101,7 +101,7 @@ json_key=plugin_name
 ```
 
 The following plugins are supported:
-  * **hgnc_trie** : Extracts HGNC gene symbols and aliases using a Trie search algorithm.
+  * **trie_hgnc** : Extracts HGNC gene symbols and aliases using a Trie search algorithm.
   * **regex_hgvsg** : Extracts genomic HGVS strings using a regular expression search.
   * **regex_hgvsc** : Extracts coding sequence HGVS strings using a regular expression search.
   * **regex_hgvsp** : Extracts protein-level HGVS strings using a regular expression search.

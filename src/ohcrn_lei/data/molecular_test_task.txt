@@ -23,5 +23,5 @@ If an entity, such as "John Doe", is mentioned multiple times in the text but is
 always use the most complete identifier for that entity. In this example, use "John Doe" as the entity ID.
 ##### END PROMPT #####
 ##### START PLUGINS #####
-tested_genes=hgnc_trie
+tested_genes=trie_hgnc
 ##### END PLUGINS #####

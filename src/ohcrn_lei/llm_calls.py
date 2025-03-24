@@ -2,7 +2,12 @@ from openai import OpenAI
 import json
 
 
-def call_gpt_api(system_msg: str, query: str, model_used: str) -> dict:
+def call_gpt_api(
+  system_msg: str, query: str, model_used: str, mock: bool = False
+) -> dict:
+  if mock:
+    return {"output": "mock"}
+
   client = OpenAI()
 
   chat_completion = client.chat.completions.create(

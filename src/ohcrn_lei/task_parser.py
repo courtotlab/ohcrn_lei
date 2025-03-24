@@ -55,8 +55,8 @@ def load_task(taskname, print_usage) -> Task:
       if len(fields) != 2:
         print(f"ERROR: Invalid plugin definition {line} in task {taskname}")
         sys.exit(os.EX_USAGE)
-      # out.update({'key':fields[0], 'op':fields[1]})
-      plugins[fields[0]] = fields[1]
+      # plugins[fields[0]] = fields[1]
+      plugins.update({fields[0]: fields[1]})
     task.set_plugins(plugins)
 
   return task

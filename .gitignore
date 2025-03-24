@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+#VSCode files
+.vscode
+
+#trie file
+hgncTrie.txt

@@ -9,6 +9,11 @@ def start() -> None:
   parser = argparse.ArgumentParser(description="Extract data from report file.")
   parser.add_argument("--no-ocr", action="store_true", help="Disable OCR processing.")
   parser.add_argument(
+    "--mock-LLM",
+    action="store_true",
+    help="Don't make real LLM call, produce mock output instead.",
+  )
+  parser.add_argument(
     "-t",
     "--task",
     type=str,
@@ -41,7 +46,7 @@ def start() -> None:
 
   # Wrap the print_usage call in a lambda function
   task = task_parser.load_task(args.task, lambda: parser.print_usage())
-  output = task.run(args.filename)
+  output = task.run(args.filename, chunk_size=2, llm_mock=args.mock_LLM)
 
   if args.outfile == "-" or args.outfile == "stdout":
     print(output)
