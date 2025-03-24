@@ -3,7 +3,7 @@ The Ontario Hereditary Cancer Research Network - LLM-based Extraction of Informa
 
 The `ohcrn-lei` tool takes a `PDF` or `TXT` file of a clinical report and extracts desired information from it, which will be output in `json` format. 
 
-It currently supports the following extraction tasks:
+It currently supports the following built-in extraction tasks:
   * **Report**: Extracts the following data:
     1. "report_date" (Collected On, Received On, etc in "YYYY-MM-DD" format).
     2. "report_type": Type of report.
@@ -26,6 +26,7 @@ It currently supports the following extraction tasks:
     8. Exon: The exon number
     9. Reference genome build: ("GRCh37","GRCh38")
 
+In addition to the built-in extraction tasks, additional tasks can also be provided via a task definition file (via the `-t` option). See [below](#task-definition-format) for the task definition file format requirements.
 
 ## Installation
 ### Preliminarily: ###
@@ -35,7 +36,7 @@ $ git clone https://github.com/courtotlab/ohcrn_lei.git
 $ cd ohcrn_lei
 $ uv run ohcrn-lei
 ```
-### 🚧🚧 After deployment on pypi becomes avaialble: 🚧🚧
+### 🚧🚧 After deployment on pypi becomes available: 🚧🚧
 
 With `uv` (fastest, if available):
 ```bash
@@ -85,3 +86,24 @@ $ git clone https://github.com/courtotlab/ohcrn_lei.git
 $ cd ohcrn_lei
 $ uv build
 ```
+## Task definition format
+
+To create a new extraction task from scratch, you can create a new task definition file. The task definition file follows the following format
+
+```text
+##### START PROMPT #####
+Enter your LLM prompt here. Must instruct the LLM to generate a JSON dictionary output.
+##### END PROMPT #####
+##### START PLUGINS #####
+json_key=plugin_name
+...
+##### END PLUGINS #####
+```
+
+The following plugins are supported:
+  * **hgnc_trie** : Extracts HGNC gene symbols and aliases using a Trie search algorithm.
+  * **regex_hgvsg** : Extracts genomic HGVS strings using a regular expression search.
+  * **regex_hgvsc** : Extracts coding sequence HGVS strings using a regular expression search.
+  * **regex_hgvsp** : Extracts protein-level HGVS strings using a regular expression search.
+  * **regex_variants** : Extracts variant IDs (OMIM,dbSNP,etc.) using a regular expression search.
+  * **regex_chromosome** : Extracts chromosome identifiers using a regular expression search.
