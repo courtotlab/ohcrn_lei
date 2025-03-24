@@ -1,7 +1,7 @@
 import requests
 import os
 import re
-from trieSearch import Trie
+from ohcrn_lei.trieSearch import Trie
 
 
 def filterAliases(symbols):
