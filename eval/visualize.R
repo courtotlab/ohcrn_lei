@@ -5,12 +5,20 @@ indir <- args[[1]]
 outdir <- args[[2]]
 
 #find input files in subdirectories of input directory
-list.dirs(indir,recursive=FALSE) |> sapply(list.files, pattern=".tsv$",full.names=TRUE) -> infiles
+list.dirs(indir,recursive=FALSE) |> 
+  sapply(list.files, pattern=".tsv$",full.names=TRUE) -> infiles
 #derive names for the input files
-input.names <- sub("/",".",gsub("^[^/]+/|\\.tsv$","",infiles))
+# input.names <- sub("/",".",gsub("^[^/]+/*|\\.tsv$","",infiles))
+gsub("^[^/]+/*|\\.tsv$","",infiles) |>
+  strsplit("/") |> lapply(rev) |> 
+  sapply(paste,collapse="\n") -> input.names
 #read input files into list of data.frames
-allCategories <- lapply(as.vector(infiles), read.delim) |> setNames(as.vector(input.names))
-
+lapply(as.vector(infiles), read.delim) |> 
+  setNames(as.vector(input.names)) -> allCategories
+#sort data by category name
+sort.order <- c(grep("report",input.names),grep("molecular",input.names),grep("variant",input.names))
+input.names <- input.names[sort.order]
+allCategories <- allCategories[input.names]
 
 # Class that draws confusion matrices
 new.category.drawer <- function(xoff=0, yoff=35, maxXoff=22) {
