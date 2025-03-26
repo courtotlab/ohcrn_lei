@@ -14,3 +14,10 @@ wheels/
 
 #trie file
 hgncTrie.txt
+
+#eval data
+eval/input/
+eval/output/
+eval/reference/
+eval/metrics/
+eval/vis/
