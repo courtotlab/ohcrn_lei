@@ -9,12 +9,12 @@ DUMMY_LLM_RESULT = {"result": "llm response"}
 
 # Dummy results for fake plugins.
 PLUGIN_RESULTS = {
-  "trie_hgnc": {"symbols": ["BRCA1", "BRCA2"]},
-  "regex_hgvsg": {"genomic": ["g.123A>T"]},
-  "regex_hgvsc": {"coding": ["c.456G>C"]},
-  "regex_hgvsp": {"protein": ["p.Val78Met"]},
-  "regex_variants": {"variants": ["rs1234"]},
-  "regex_chromosome": {"chromosomes": ["chr1", "chr2"]},
+  "trie_hgnc": ["BRCA1", "BRCA2"],
+  "regex_hgvsg": ["g.123A>T"],
+  "regex_hgvsc": ["c.456G>C"],
+  "regex_hgvsp": ["p.Val78Met"],
+  "regex_variants": ["rs1234"],
+  "regex_chromosome": ["chr1", "chr2"],
 }
 
 
