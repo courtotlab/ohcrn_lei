@@ -6,6 +6,9 @@ dist/
 wheels/
 *.egg-info
 
+# MacOS
+.DS_Store
+
 # Virtual environments
 .venv
 
@@ -21,3 +24,4 @@ eval/output/
 eval/reference/
 eval/metrics/
 eval/vis/
+eval/old_result/
