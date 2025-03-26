@@ -97,14 +97,45 @@ class Task:
               pl_output = get_chromosomes(pages_text)
             case _:
               raise ValueError(f"Unrecognized plugin name: {plugin_name}")
-          # add or replace
-          full_results[page_key].update({path: pl_output})
+          # full_results[page_key].update({path: pl_output})
+          if path in full_results[page_key]:
+            # if path already created by LLM output
+            old_val = full_results[page_key][path]
+            full_results[page_key][path] = self.integrateResults(old_val,pl_output)
+          else: # path doesn't exist yet, so we create it
+            full_results[page_key][path] = pl_output
 
       i += chunk_size
 
     return full_results
 
+
+  def integrateResults(self, xs, ys):
+    """
+    Intersects two lists (instead of sets) 
+    while preserving duplicates
+    """
+    if type(xs) is not list:
+      xs = [xs]
+    if type(ys) is not list:
+      ys = [ys]
+    taken_js = set()
+    for i in range(len(xs)):
+      j = 0
+      for j in range(len(ys)):
+        if j not in taken_js and xs[i] == ys[j]:
+          taken_js.add(j)
+          break
+    unused_js = set(j for j in range(len(ys))) - taken_js
+    unused_ys = [ys[j] for j in unused_js]
+    return xs + unused_ys
+    
+
   def convert_txt_to_str_list(self, inputfile: str) -> List[str]:
+    """
+    Reads a text file and wraps it in a list.
+    This simulates multi-page readout from a PDF
+    """
     try:
       with open(inputfile, "r", encoding="utf-8") as instream:
         text = instream.read()
