@@ -79,11 +79,11 @@ def greedyPairOff(xs, ys):
   return {"hits": len(taken_is), "unused_xs": unused_xs, "unused_ys": unused_ys}
 
 def printTable(data:dict) -> None:
-  def list2str(l):
-    if type(l) is list:
-      return "|".join(l)
+  def list2str(x):
+    if type(x) is list:
+      return "|".join(x)
     else:
-      return str(l)
+      return str(x)
   colnames = list(data.values())[0].keys()
   print("\t".join(colnames))
   for rowname, row_dict in data.items():
