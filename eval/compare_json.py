@@ -48,13 +48,27 @@ def normalizeNames(xs):
     x = re.sub(r"Chr.+:g\.", "", x)
     x = re.sub(r"^g\.|^c\.|^p\.", "", x)
     x = re.sub(r"^\(|\)$", "", x)
+    if re.match(r"^\d+-\d+$", x):
+      x = re.sub(r"-\d+$", "", x)
     # normalize omim, clinvar, dbsnp
     x = re.sub(r"^OMIM\D+", "", x)
     x = re.sub(r"^Clinvar[^V]*", "", x, flags=re.IGNORECASE)
     x = re.sub(r"^dbSNP[^r]*", "", x, flags=re.IGNORECASE)
+    # normalize chromosomes
+    if re.match(r"^ChrX$|^ChrY$|^Chr\d$", x, flags=re.IGNORECASE):
+      x = re.sub(r"Chr", "", x, flags=re.IGNORECASE)
+    # remove location tags
+    x = re.sub(
+      r" ?\(Toronto$| ?\(Kingston$| ?\(Ottawa| ?\(London| ?\(Orillia.*| ?\(Mississauga",
+      "",
+      x,
+      flags=re.IGNORECASE,
+    )
     # convert everything to uppercase for case insensitive matching
     x = x.upper()
-    out.append(x)
+    # treat NOT SPECIFIED or REDACTED as empty values
+    if x not in ["NOT SPECIFIED", "REDACTED", "N/A"]:
+      out.append(x)
   return out
 
 
@@ -78,17 +92,19 @@ def greedyPairOff(xs, ys):
   unused_ys = [ys[j] for j in unused_js]
   return {"hits": len(taken_is), "unused_xs": unused_xs, "unused_ys": unused_ys}
 
-def printTable(data:dict) -> None:
+
+def printTable(data: dict) -> None:
   def list2str(x):
     if type(x) is list:
       return "|".join(x)
     else:
       return str(x)
+
   colnames = list(data.values())[0].keys()
   print("\t".join(colnames))
   for rowname, row_dict in data.items():
     valStr = [list2str(v) for v in row_dict.values()]
-    print(rowname+"\t"+"\t".join(valStr))
+    print(rowname + "\t" + "\t".join(valStr))
 
 
 output = {}
@@ -109,6 +125,14 @@ for pageKey in refData:
     tp = matches["hits"]
     fn = len(matches["unused_xs"])
     fp = len(matches["unused_ys"])
+    # incorrect extractions show off as both fp and fn
+    # e.g. extracting 'HE' instead of 'CHEK2'
+    # so to prevent double-counting we only count them as fp
+    fn = max(fn - fp, 0)
+    # if there's nothing to extract from this report, then
+    # nothing is the correct response
+    if len(refval) == 0 and len(testval) == 0:
+      tp = 1
 
     if key in output:
       output[key]["tp"] = output[key]["tp"] + tp
