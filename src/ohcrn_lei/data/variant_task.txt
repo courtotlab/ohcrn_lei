@@ -35,9 +35,9 @@ If an entity, such as "John Doe", is mentioned multiple times in the text but is
 always use the most complete identifier for that entity. In this example, use "John Doe" as the entity ID.
 ##### END PROMPT #####
 ##### START PLUGINS #####
-gDNA=regex_hgvsg
-cDNA=regex_hgvsc
-pDNA=regex_hgvsp
-variant_ids=regex_variants
+genomic_hgvs=regex_hgvsg
+coding_hgvs=regex_hgvsc
+protein_hgvs=regex_hgvsp
+variation_code=regex_variants
 chromosome=regex_chromosome
 ##### END PLUGINS #####

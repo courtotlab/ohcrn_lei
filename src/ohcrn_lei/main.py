@@ -5,6 +5,12 @@ import os
 import sys
 
 
+# helper function to exit with error message
+def die(msg, code=1):
+  print("ERROR: " + msg, file=sys.stderr)
+  sys.exit(code)
+
+
 def start() -> None:
   parser = argparse.ArgumentParser(description="Extract data from report file.")
   parser.add_argument("--no-ocr", action="store_true", help="Disable OCR processing.")
@@ -47,14 +53,12 @@ def start() -> None:
   if args.no_ocr:
     # check that the file isn't a PDF file
     if args.filename.endswith(".pdf"):
-      print("When using --no-ocr, the input file cannot be a PDF!")
-      sys.exit(os.EX_USAGE)
+      die("When using --no-ocr, the input file cannot be a PDF!", os.EX_USAGE)
     print(" * OCR disabled")
 
   # check that file can be read
   if not os.access(args.filename, os.R_OK):
-    print(f"ERROR: File {args.filename} does not exist or cannot be read!")
-    sys.exit(os.EX_IOERR)
+    die(f"ERROR: File {args.filename} does not exist or cannot be read!", os.EX_IOERR)
 
   # Wrap the print_usage call in a lambda function
   task = task_parser.load_task(args.task, lambda: parser.print_usage())
@@ -69,8 +73,7 @@ def start() -> None:
       with open(args.outfile, "w") as fp:
         json.dump(output, fp)
     except Exception as e:
-      print(f"ERROR: Unable to write output file {args.outfile}.\n{e}")
-      sys.exit(os.EX_IOERR)
+      die(f"ERROR: Unable to write output file {args.outfile}.\n{e}", os.EX_IOERR)
     else:
       print(f"Output successfully written to {args.outfile}")
 

@@ -5,6 +5,12 @@ import sys
 from ohcrn_lei.task import Task
 
 
+# helper function to exit with error message
+def die(msg, code=1):
+  print("ERROR: " + msg, file=sys.stderr)
+  sys.exit(code)
+
+
 def load_task(taskname, print_usage) -> Task:
   """
   Load a task by name. The name can either be
@@ -19,11 +25,11 @@ def load_task(taskname, print_usage) -> Task:
       with open(taskname, "r", encoding="utf-8") as tin:
         taskData = tin.read()
     except Exception as e:
-      print(
-        f"ERROR: Task argument looks like a file, but that file cannot be found or read: {e}"
-      )
       print_usage()
-      sys.exit(os.EX_IOERR)
+      die(
+        f"Task argument looks like a file, but that file cannot be found or read: {e}",
+        os.EX_IOERR,
+      )
 
   # otherwise try to load interal task file
   else:
@@ -36,19 +42,16 @@ def load_task(taskname, print_usage) -> Task:
         taskData = tf.read_text()
 
   if not taskData:
-    print(f"ERROR: Unknown task {taskname}")
     print_usage()
-    sys.exit(os.EX_USAGE)
+    die(f"Unknown task {taskname}", os.EX_USAGE)
 
   try:
     task_sections = split_sections(taskData)
   except ValueError as e:
-    print(f"ERROR: Invalid task file format: {e}")
-    sys.exit(os.EX_USAGE)
+    die(f"Invalid task file format: {e}", os.EX_USAGE)
 
   if "PROMPT" not in task_sections:
-    print("ERROR: Invalid task file format: No prompt section.")
-    sys.exit(os.EX_USAGE)
+    die("Invalid task file format: No prompt section.", os.EX_USAGE)
 
   task = Task(task_sections["PROMPT"])
 
@@ -57,8 +60,7 @@ def load_task(taskname, print_usage) -> Task:
     for line in task_sections["PLUGINS"].splitlines():
       fields = line.split("=")
       if len(fields) != 2:
-        print(f"ERROR: Invalid plugin definition {line} in task {taskname}")
-        sys.exit(os.EX_USAGE)
+        die(f"Invalid plugin definition {line} in task {taskname}", os.EX_USAGE)
       # plugins[fields[0]] = fields[1]
       plugins.update({fields[0]: fields[1]})
     task.set_plugins(plugins)

@@ -12,6 +12,12 @@ from ohcrn_lei.regex_utils import get_variant_ids
 from ohcrn_lei.regex_utils import get_chromosomes
 
 
+# helper function to exit with error message
+def die(msg, code=1):
+  print("ERROR: " + msg, file=sys.stderr)
+  sys.exit(code)
+
+
 class Task:
   """
   Task performs an extraction task. It gets configured with an
@@ -77,6 +83,8 @@ class Task:
           match plugin_name:
             case "trie_hgnc":
               pl_output = find_HGNC_symbols(pages_text)
+              # remove duplicates and sort
+              pl_output = sorted(set(pl_output))
             case "regex_hgvsg":
               pl_output = get_genomic_changes(pages_text)
             case "regex_hgvsc":
@@ -101,7 +109,6 @@ class Task:
       with open(inputfile, "r", encoding="utf-8") as instream:
         text = instream.read()
     except Exception as e:
-      print(f"ERROR: Unable to read file {inputfile}: {e}")
-      sys.exit(os.EX_IOERR)
+      die(f"Unable to read file {inputfile}: {e}", os.EX_IOERR)
     # simulate multiple pages for plain text input
     return [text]
