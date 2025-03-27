@@ -1,6 +1,17 @@
 # 🌺🌺🌺🌺🌺🌺 OHCRN-LEI 🌺🌺🌺🌺🌺🌺 
 The Ontario Hereditary Cancer Research Network - LLM-based Extraction of Information
 
+[![Python application](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml/badge.svg)](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml)
+
+## Table of contents
+ 1. [Overview](#overview)
+ 2. [Installation](#installation)
+ 3. [Using OHCRN-LEI](#usage)
+ 4. [Building OHCRN-LEI](#how-to-build-the-project)
+ 5. [Creating custom extraction tasks](#task-definition-format)
+
+## Overview
+
 The `ohcrn-lei` tool takes a `PDF` or `TXT` file of a clinical report and extracts desired information from it, which will be output in `json` format. 
 
 It currently supports the following built-in extraction tasks:
@@ -30,13 +41,15 @@ In addition to the built-in extraction tasks, additional tasks can also be provi
 
 ## Installation
 ### Preliminarily: ###
-We recommend installing `ohcrn-lei` via `uv` (https://docs.astral.sh/uv/#installation).
-Until the project is deployed to pypi, it's better to check out the tool and run it without installing, via [`uv`](https://docs.astral.sh/uv/#installation):
+We recommend installing `ohcrn-lei` via `uv`. If you don't have `uv`, you can install it from [here](https://docs.astral.sh/uv/#installation). (It only takes seconds!)
+
+  1. Download the wheel (`.whl`) file from the [latest release](https://github.com/courtotlab/ohcrn_lei/releases)
+  2. Install the wheel file via `uv`.
 
 ```bash
-$ git clone https://github.com/courtotlab/ohcrn_lei.git
-$ cd ohcrn_lei
-$ uv run ohcrn-lei
+# substitute the link below with the latest release
+$ wget 'https://github.com/courtotlab/ohcrn_lei/releases/download/v0.2.0/ohcrn_lei-0.1.0-py3-none-any.whl'
+$ uv tool install ohcrn_lei-0.1.0-py3-none-any.whl
 ```
 ### 🚧🚧 After deployment on pypi becomes available: 🚧🚧
 
@@ -45,7 +58,7 @@ With `uv` (fastest and easierst, if available):
 uv tool install ohcrn_lei
 ```
 
-With pip (slower):
+With `pip` (slower):
 ```bash
 # This will require python 3.13 or higher to be installed
 pipx install --user ohcrn_lei
