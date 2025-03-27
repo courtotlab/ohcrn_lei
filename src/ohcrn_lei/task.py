@@ -101,18 +101,17 @@ class Task:
           if path in full_results[page_key]:
             # if path already created by LLM output
             old_val = full_results[page_key][path]
-            full_results[page_key][path] = self.integrateResults(old_val,pl_output)
-          else: # path doesn't exist yet, so we create it
+            full_results[page_key][path] = self.integrateResults(old_val, pl_output)
+          else:  # path doesn't exist yet, so we create it
             full_results[page_key][path] = pl_output
 
       i += chunk_size
 
     return full_results
 
-
   def integrateResults(self, xs, ys):
     """
-    Intersects two lists (instead of sets) 
+    Intersects two lists (instead of sets)
     while preserving duplicates
     """
     if type(xs) is not list:
@@ -129,7 +128,6 @@ class Task:
     unused_js = set(j for j in range(len(ys))) - taken_js
     unused_ys = [ys[j] for j in unused_js]
     return xs + unused_ys
-    
 
   def convert_txt_to_str_list(self, inputfile: str) -> List[str]:
     """
