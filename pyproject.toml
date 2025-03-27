@@ -1,7 +1,7 @@
 [project]
 name = "ohcrn-lei"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "The ohcrn-lei tool takes a PDF or TXT file of a clinical report and extracts desired information from it, which will be output in json format."
 readme = "README.md"
 authors = [
     { name = "Jochen Weile", email = "jweile@oicr.on.ca" }

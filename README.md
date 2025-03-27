@@ -30,7 +30,9 @@ In addition to the built-in extraction tasks, additional tasks can also be provi
 
 ## Installation
 ### Preliminarily: ###
+We recommend installing `ohcrn-lei` via `uv` (https://docs.astral.sh/uv/#installation).
 Until the project is deployed to pypi, it's better to check out the tool and run it without installing, via [`uv`](https://docs.astral.sh/uv/#installation):
+
 ```bash
 $ git clone https://github.com/courtotlab/ohcrn_lei.git
 $ cd ohcrn_lei
@@ -38,14 +40,15 @@ $ uv run ohcrn-lei
 ```
 ### 🚧🚧 After deployment on pypi becomes available: 🚧🚧
 
-With `uv` (fastest, if available):
+With `uv` (fastest and easierst, if available):
 ```bash
 uv tool install ohcrn_lei
 ```
 
 With pip (slower):
 ```bash
-pip install --user ohcrn_lei
+# This will require python 3.13 or higher to be installed
+pipx install --user ohcrn_lei
 ```
 
 ## Usage
