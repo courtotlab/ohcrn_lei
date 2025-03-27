@@ -63,9 +63,9 @@ def get_variant_ids(text: str) -> List[str]:
     r"(?:OMIM)(?:\s*[:#])?\s*\d+",
     r"(?:Clinvar:)?([SRV]CV[A-Z0-9]{9})",
     r"(?:dbSNP:)?(rs\d+)",
-    r"^COSMIC:COSM[0-9]+$",
-    r"^clingene:CA\d+$",
-    r"^uniprot:\.var:\d+$",
+    r"COSMIC:COSM[0-9]+",
+    r"clingene:CA\d+",
+    r"uniprot:\.var:\d+",
   ]
 
   found_ids = []
