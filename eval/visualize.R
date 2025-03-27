@@ -4,6 +4,10 @@ args <- commandArgs(TRUE)
 indir <- args[[1]]
 outdir <- args[[2]]
 
+####################################
+## READ DATA FROM INPUT DIRECTORY ##
+####################################
+
 #find input files in subdirectories of input directory
 list.dirs(indir,recursive=FALSE) |> 
   sapply(list.files, pattern=".tsv$",full.names=TRUE) -> infiles
@@ -19,6 +23,10 @@ lapply(as.vector(infiles), read.delim) |>
 sort.order <- c(grep("report",input.names),grep("molecular",input.names),grep("variant",input.names))
 input.names <- input.names[sort.order]
 allCategories <- allCategories[input.names]
+
+#############################
+## DRAW CONFUSION MATRICES ##
+#############################
 
 # Class that draws confusion matrices
 new.category.drawer <- function(xoff=0, yoff=35, maxXoff=22) {
@@ -126,4 +134,57 @@ for (i in 1:length(allCategories)) {
   drawer$move.yoff(-6)
 
 }
+invisible(dev.off())
+
+
+
+####################################
+## DRAW PRECISION-RECALL BARPLOTS ##
+####################################
+
+#helper function to calculate precision, recall and F1 score for a given category
+prCat <- function(category) {
+  totals <- colSums(category)
+  recall <- totals[["tp"]]/(totals[["tp"]]+totals[["fn"]])
+  precision <- totals[["tp"]]/(totals[["tp"]]+totals[["fp"]])
+  f1 <- 2/(recall^-1 + precision^-1)
+  return(c(recall=recall, precision=precision, f1=f1))
+}
+
+#process all categories with that function
+allCategories |> sapply(prCat) -> prResult
+
+# Convert result data into 3D-array with 3rd dimension representing OCR/nonOCR
+prResult3D <- array(NA,dim=c(3,3,2),dimnames=list(rownames(prResult),c("Report","Mol.Test","Variant"),c("OCR","No.OCR")))
+prResult3D[,,1] <- prResult[,c(2,4,6)]
+prResult3D[,,2] <- prResult[,c(1,3,5)]
+
+# print(prResult3D)
+
+outfile <- paste0(outdir,"/prPerCategory.pdf")
+pdf(outfile,width=5,height=3)
+
+plotColors <- sapply(c("darkolivegreen","steelblue","firebrick"), paste0, 3:4)
+
+op <- par(bg="white",mar=c(1,4,1,1))
+plot(NA,type="n",xlim=c(1,20),ylim=c(-10,100),axes=FALSE,xlab="",ylab="%")
+axis(2)
+for (i in 1:ncol(prResult3D)) {
+  x <- (i-1)*4 +1
+  rect(x+(0:2),0,x+(1:3),prResult3D[,i,1]*100,col=plotColors[1,],border=NA)
+  rect(x+(0:2),prResult3D[,i,1]*100,x+(1:3),prResult3D[,i,2]*100,col=plotColors[2,],border=NA)
+  text(x+1.5, -7, colnames(prResult3D)[[i]])
+}
+grid(NA,NULL)
+#draw a custom legend
+x <- 13
+ys <- c(50,35,20)
+#white background box
+rect(x-.5,min(ys)-8,x+7,max(ys+40),col="white")
+#colored legend squares
+rect(x,ys,x+1,ys+10,col=plotColors[1,],border=NA)
+rect(x+1,ys,x+2,ys+10,col=plotColors[2,],border=NA)
+text(x+2,ys+5,rownames(prResult3D),pos=4)
+text(c(x,x+1),ys[[1]]+15,dimnames(prResult3D)[[3]],pos=4,srt=45,cex=.8)
+
 invisible(dev.off())
