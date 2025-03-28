@@ -1,14 +1,9 @@
 import argparse
 import json
-from ohcrn_lei import task_parser
 import os
-import sys
 
-
-# helper function to exit with error message
-def die(msg, code=1):
-  print("ERROR: " + msg, file=sys.stderr)
-  sys.exit(code)
+from ohcrn_lei import task_parser
+from ohcrn_lei.cli import die
 
 
 def start() -> None:
@@ -58,10 +53,11 @@ def start() -> None:
 
   # check that file can be read
   if not os.access(args.filename, os.R_OK):
-    die(f"ERROR: File {args.filename} does not exist or cannot be read!", os.EX_IOERR)
+    die(f"File {args.filename} does not exist or cannot be read!", os.EX_IOERR)
 
-  # Wrap the print_usage call in a lambda function
+  # Load the appropriate task. Pass print_usage as a lambda function for the task loader to use
   task = task_parser.load_task(args.task, lambda: parser.print_usage())
+  # TODO: parameterize the chunk_size
   output = task.run(
     args.filename, chunk_size=2, no_ocr=args.no_ocr, llm_mock=args.mock_LLM
   )
@@ -71,9 +67,10 @@ def start() -> None:
   else:
     try:
       with open(args.outfile, "w") as fp:
+        # TODO: Look into pretty-print https://stackoverflow.com/questions/12943819/how-to-prettyprint-a-json-file
         json.dump(output, fp)
     except Exception as e:
-      die(f"ERROR: Unable to write output file {args.outfile}.\n{e}", os.EX_IOERR)
+      die(f"Unable to write output file {args.outfile}.\n{e}", os.EX_IOERR)
     else:
       print(f"Output successfully written to {args.outfile}")
 

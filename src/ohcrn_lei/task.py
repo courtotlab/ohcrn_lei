@@ -1,21 +1,17 @@
 import os
-import sys
 from typing import List
 
-from ohcrn_lei.llm_calls import call_gpt_api
+from ohcrn_lei.cli import die
 from ohcrn_lei.extractHGNCSymbols import find_HGNC_symbols
+from ohcrn_lei.llm_calls import call_gpt_api
 from ohcrn_lei.pdf_to_text import convert_pdf_to_str_list
-from ohcrn_lei.regex_utils import get_coding_changes
-from ohcrn_lei.regex_utils import get_genomic_changes
-from ohcrn_lei.regex_utils import get_protein_changes
-from ohcrn_lei.regex_utils import get_variant_ids
-from ohcrn_lei.regex_utils import get_chromosomes
-
-
-# helper function to exit with error message
-def die(msg, code=1):
-  print("ERROR: " + msg, file=sys.stderr)
-  sys.exit(code)
+from ohcrn_lei.regex_utils import (
+  get_chromosomes,
+  get_coding_changes,
+  get_genomic_changes,
+  get_protein_changes,
+  get_variant_ids,
+)
 
 
 class Task:

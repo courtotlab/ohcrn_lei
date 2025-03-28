@@ -1,14 +1,9 @@
 import importlib.resources
-import re
 import os
-import sys
+import re
+
+from ohcrn_lei.cli import die
 from ohcrn_lei.task import Task
-
-
-# helper function to exit with error message
-def die(msg, code=1):
-  print("ERROR: " + msg, file=sys.stderr)
-  sys.exit(code)
 
 
 def load_task(taskname, print_usage) -> Task:
