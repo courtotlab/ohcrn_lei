@@ -1,39 +1,13 @@
-import argparse
 import json
 import os
 
 from ohcrn_lei import task_parser
-from ohcrn_lei.cli import die
+from ohcrn_lei.cli import die, process_cli_args
 
 
 def start() -> None:
-  parser = argparse.ArgumentParser(description="Extract data from report file.")
-  parser.add_argument("--no-ocr", action="store_true", help="Disable OCR processing.")
-  parser.add_argument(
-    "--mock-LLM",
-    action="store_true",
-    help="Don't make real LLM call, produce mock output instead.",
-  )
-  parser.add_argument(
-    "-t",
-    "--task",
-    type=str,
-    default="report",
-    help="Specify the extraction task. This can either be a "
-    "pre-defined task ('report','molecular_test','variant')"
-    "or a plain *.txt file with a task definition. See documentation"
-    "for the task definition file format specification."
-    "Default: report",
-  )
-  parser.add_argument(
-    "-o",
-    "--outfile",
-    type=str,
-    default="-",
-    help="Output file or '-' for stdout (default)",
-  )
-  parser.add_argument("filename", type=str, help="Path to the report file to process.")
-  args = parser.parse_args()
+  # parse command line arguments
+  cli_parser, args = process_cli_args()
 
   # Output the parsed arguments
   print("Processing file:", args.filename)
@@ -56,10 +30,12 @@ def start() -> None:
     die(f"File {args.filename} does not exist or cannot be read!", os.EX_IOERR)
 
   # Load the appropriate task. Pass print_usage as a lambda function for the task loader to use
-  task = task_parser.load_task(args.task, lambda: parser.print_usage())
-  # TODO: parameterize the chunk_size
+  task = task_parser.load_task(args.task, lambda: cli_parser.print_usage())
   output = task.run(
-    args.filename, chunk_size=2, no_ocr=args.no_ocr, llm_mock=args.mock_LLM
+    args.filename,
+    chunk_size=args.page_batch,
+    no_ocr=args.no_ocr,
+    llm_mock=args.mock_LLM,
   )
 
   if args.outfile == "-" or args.outfile == "stdout":
