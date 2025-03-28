@@ -1,5 +1,7 @@
 import os
+
 import pytest
+
 from ohcrn_lei.task import Task
 from ohcrn_lei.task_parser import load_task, split_sections
 

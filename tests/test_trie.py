@@ -1,4 +1,5 @@
 import pytest
+
 from ohcrn_lei.trieSearch import Trie
 
 

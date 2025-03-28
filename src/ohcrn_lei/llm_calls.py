@@ -1,5 +1,6 @@
-from openai import OpenAI
 import json
+
+from openai import OpenAI
 
 
 def call_gpt_api(

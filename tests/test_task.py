@@ -1,7 +1,7 @@
 import os
+
 import pytest
 
-# Import the Task class.
 from ohcrn_lei.task import Task
 
 # Dummy data to return from our fake LLM call.

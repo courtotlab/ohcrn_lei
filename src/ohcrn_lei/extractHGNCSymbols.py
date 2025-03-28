@@ -1,7 +1,9 @@
-from typing import List
-import requests
 import os
 import re
+from typing import List
+
+import requests
+
 from ohcrn_lei.trieSearch import Trie
 
 
@@ -107,6 +109,7 @@ def find_HGNC_symbols(text: str) -> List[str]:
   """
   # Load Trie of HGNC symbols
   hgnc_url = "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/non_alt_loci_set.txt"
+  # TODO: Load trie from internal package storage
   trie = load_or_build_Trie("hgncTrie.txt", hgnc_url)
 
   # Searching the text using the trie
