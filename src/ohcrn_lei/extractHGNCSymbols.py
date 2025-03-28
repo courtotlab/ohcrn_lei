@@ -1,9 +1,11 @@
+import importlib.resources
 import os
 import re
 from typing import List
 
 import requests
 
+from ohcrn_lei.cli import die
 from ohcrn_lei.trieSearch import Trie
 
 
@@ -47,7 +49,7 @@ def parse_HGNC_from_URL(hgnc_url: str) -> Trie:
           else:
             print("Warning: No gene symbol in line ", line)
   except requests.exceptions.RequestException as e:
-    print("Failed to download the HGNC file:", e)
+    die(f"Failed to download the HGNC file: {e}", os.EX_IOERR)
   return trie
 
 
@@ -57,17 +59,34 @@ def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
   If it doesn't exist, build a new Trie from the HGNC source on the internet,
   serialize it and store it in the cache file.
   """
-  if os.path.exists(trieFile):
+  # First, try to load from package internal data
+  try:
+    resource_file = importlib.resources.files("ohcrn_lei") / "data" / "hgncTrie.txt"
+    serialized = resource_file.read_text()
+  except Exception as e:
+    print(f"Failed to find internal HGNC trie: {e}")
+  if serialized:
+    try:
+      trie = Trie.deserialize(serialized)
+      print("Gene symbol Trie loaded from internal storage.")
+    except ValueError as e:
+      print(f"HGNC-Trie has invalid format: {e}")
+
+  # if that failed, try to load from local file
+  if not trie and os.path.exists(trieFile):
     try:
       with open(trieFile, "r", encoding="utf-8") as infile:
         serialized = infile.read()
         trie = Trie.deserialize(serialized)
         print("Gene symbol Trie read from file.")
     except Exception as e:
-      print(f"Error while reading file {e}")
+      die(f"Error while reading file {e}", os.EX_IOERR)
     except ValueError as e:
-      print(f"Format error while reading file: {e}")
-  else:
+      die(f"HGNC-Trie file has invalid format: {e}", os.EX_DATAERR)
+
+  # as a last resort, connect to HGNC online and parse their
+  # gene symbol file from scratch, then save a local cache
+  if not trie:
     trie = parse_HGNC_from_URL(hgnc_url)
     print("Parsed gene symbols from HGNC into Trie.")
     serialized = trie.serialize()
@@ -76,7 +95,7 @@ def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
         file.write(serialized)
       print("Serialized gene symbol Trie saved.")
     except Exception as e:
-      print(f"Error while writing file: {e}")
+      die(f"Error while writing file: {e}", os.EX_IOERR)
 
   return trie
 
@@ -109,7 +128,6 @@ def find_HGNC_symbols(text: str) -> List[str]:
   """
   # Load Trie of HGNC symbols
   hgnc_url = "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/non_alt_loci_set.txt"
-  # TODO: Load trie from internal package storage
   trie = load_or_build_Trie("hgncTrie.txt", hgnc_url)
 
   # Searching the text using the trie
