@@ -1,14 +1,16 @@
-# 🌺🌺🌺🌺🌺🌺 OHCRN-LEI 🌺🌺🌺🌺🌺🌺 
-The Ontario Hereditary Cancer Research Network - LLM-based Extraction of Information
+<h1 align="center">🌺🌺🌺🌺🌺🌺 OHCRN-LEI 🌺🌺🌺🌺🌺🌺</h1>
+<p align="center">The Ontario Hereditary Cancer Research Network - LLM-based Extraction of Information
+</p>
 
+<p align="center">
+<a href="#overview">Overview</a> • 
+<a href="#getting-started">Getting started</a> • 
+<a href="#contributing">Contributing</a> • 
+<a href="#citation">Citation</a>
+</p>
+
+## Status
 [![Python application](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml/badge.svg)](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml)
-
-## Table of contents
- 1. [Overview](#overview)
- 2. [Installation](#installation)
- 3. [Using OHCRN-LEI](#usage)
- 4. [Building OHCRN-LEI](#how-to-build-the-project)
- 5. [Creating custom extraction tasks](#task-definition-format)
 
 ## Overview
 
@@ -39,11 +41,11 @@ It currently supports the following built-in extraction tasks:
 
 In addition to the built-in extraction tasks, additional tasks can also be provided via a task definition file (via the `-t` option). See [below](#task-definition-format) for the task definition file format requirements.
 
-## Installation
-### OS dependencies ###
+## Getting started
+### Prerequisites ###
 OHCRN-LEI requires `poppler` to be installed. If you don't have `poppler` installed already, you can do so as follows:
 
-**MacOS:**
+**MacOS (via homewbrew):**
 ```bash
 $ brew install poppler
 ```
@@ -52,8 +54,19 @@ $ brew install poppler
 $ sudo apt install poppler-utils
 ```
 
-### Preliminarily: ###
-We recommend installing `ohcrn-lei` via `uv`. If you don't have `uv`, you can install it from [here](https://docs.astral.sh/uv/#installation). (It only takes seconds!)
+We also recommend `uv` for a faster and easier installation process. (It only takes seconds!)
+
+**MacOS (via homewbrew):**
+```bash
+$ brew install uv
+```
+**Linux:**
+```bash
+$ curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Installation ###
+**Preliminarily:**
 
   1. Download the wheel (`.whl`) file from the [latest release](https://github.com/courtotlab/ohcrn_lei/releases)
   2. Install the wheel file via `uv`.
@@ -63,32 +76,34 @@ We recommend installing `ohcrn-lei` via `uv`. If you don't have `uv`, you can in
 $ wget 'https://github.com/courtotlab/ohcrn_lei/releases/download/v0.2.0/ohcrn_lei-0.1.0-py3-none-any.whl'
 $ uv tool install ohcrn_lei-0.1.0-py3-none-any.whl
 ```
-### 🚧🚧 After deployment on pypi becomes available: 🚧🚧
+**🚧🚧 After deployment on pypi becomes available: 🚧🚧**
 
-With `uv` (fastest and easierst, if available):
+With `uv` (fastest and easiest, if available):
 ```bash
 uv tool install ohcrn_lei
 ```
 
 With `pip` (slower):
 ```bash
-# This will require python 3.13 or higher to be installed
+# This will require python 3.13 or higher to be installed!
 pipx install --user ohcrn_lei
 ```
 
-## Usage
-After installation, you can run the `ohcrn-lei` in your command line.
-
-For example, to run the `Report` extraction task on the file `example.pdf`, run:
+### Usage
+After installation, you can run the `ohcrn-lei` in your command line. For example, to run the `report` extraction task on the file `example.pdf`, run:
 
 ```bash
 ohrcn-lei --task report -outfile output.json example.pdf
 ```
 
+Currently, the `report`, `molecular_test` and `variant` task are supported out-of-the-box. However, you can also [create your own custom tasks](#creating-custom-tasks). 
+
 The full set of parameters can be found below:
 
 ```text
-usage: ohcrn-lei [-h] [--no-ocr] [-t TASK] [-o OUTFILE] filename
+usage: ohcrn-lei [-h] [-b PAGE_BATCH] [-t TASK] [-o OUTFILE]
+                 [--mock-LLM] [--no-ocr]
+                 filename
 
 Extract data from report file.
 
@@ -97,24 +112,23 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  --no-ocr              Disable OCR processing.
-  -t, --task TASK       Specify the extraction task. This can either be a pre-
-                        defined task ('report','molecular_test','variant')or a
-                        plain *.txt file with a task definition. See
-                        documentationfor the task definition file format
-                        specification.Default: report
+  -b, --page-batch PAGE_BATCH
+                        Number of pages to be processed at a given
+                        time. Default=2
+  -t, --task TASK       Specify the extraction task. This can either be
+                        a pre-defined task
+                        ('report','molecular_test','variant')or a plain
+                        *.txt file with a task definition. See
+                        documentationfor the task definition file
+                        format specification.Default: report
   -o, --outfile OUTFILE
                         Output file or '-' for stdout (default)
+  --mock-LLM            Don't make real LLM call, produce mock output
+                        instead.
+  --no-ocr              Disable OCR processing.
 ```
 
-## How to build the project
-To build the project, we recommend using [`uv`](https://docs.astral.sh/uv/#installation)
-```bash
-$ git clone https://github.com/courtotlab/ohcrn_lei.git
-$ cd ohcrn_lei
-$ uv build
-```
-## Task definition format
+### Creating custom tasks
 
 To create a new extraction task from scratch, you can create a new task definition file. The task definition file follows the following format
 
@@ -135,6 +149,16 @@ The following plugins are supported:
   * **regex_hgvsp** : Extracts protein-level HGVS strings using a regular expression search.
   * **regex_variants** : Extracts variant IDs (OMIM,dbSNP,etc.) using a regular expression search.
   * **regex_chromosome** : Extracts chromosome identifiers using a regular expression search.
+
+## Contributing
+### How to build the project
+To build the project from source, use [`uv`](https://docs.astral.sh/uv/#installation)
+```bash
+$ git clone https://github.com/courtotlab/ohcrn_lei.git
+$ cd ohcrn_lei
+$ uv build
+```
+The resulting `.whl` file will be n the `dist/` directory.
 
 ## Citation
 Coming soon.
