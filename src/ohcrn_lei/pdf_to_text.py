@@ -1,63 +1,67 @@
-import tempfile
+import os
 from typing import List
-import fitz
+
 import easyocr
+import numpy as np
+from pdf2image import convert_from_path
+
+from ohcrn_lei.cli import die
 
 
-def convert_pdf_to_text(pdf_file_path: str) -> str:
-  doc = fitz.open(pdf_file_path)
+def convert_pdf_to_str_list(pdf_path, language_list=["en"], dpi=300) -> List[str]:
+  """
+  Use EasyOCR to convert the given PDF file into plain text but page by page.
+  Returns a list of strings representing each page.
+  """
+  # Initialize the EasyOCR reader.
+  reader = easyocr.Reader(language_list)
 
-  zoom = 4
-  mat = fitz.Matrix(zoom, zoom)
+  # Convert PDF pages to images.
+  try:
+    # You can adjust dpi if necessary.
+    pages = convert_from_path(pdf_path, dpi=dpi)
+  except Exception as e:
+    die(f"Failed to converting PDF to images: {e}", os.EX_CONFIG)
 
-  reader = easyocr.Reader(["en"])
+  full_text = []
+  for i, page in enumerate(pages):
+    print(f"Processing page {i + 1}...")
+    # Convert PIL image to numpy array.
+    image_np = np.array(page)
 
-  # List to store OCR results from all pages
-  all_text = ""
+    # Use EasyOCR to extract text from the image.
+    try:
+      results = reader.readtext(image_np, detail=0, paragraph=True)
+      # Join text from detected regions.
+      page_text = "\n".join(results)
+      full_text.append(page_text)
+    except Exception as e:
+      die(
+        f"Failed processing page {i + 1}: {e}",
+      )
 
-  # Loop through each page in the PDF
-  for i in range(len(doc)):
-    val = f"image_{i + 1}.png"
-
-    # Convert page to image
-    page = doc.load_page(i)
-    pix = page.get_pixmap(matrix=mat)
-    pix.save(val)
-
-    # Read text from the image
-    result = reader.readtext(val, detail=0)
-    all_text += "\n".join(result) + "\n"
-
-  doc.close()
-
-  return all_text
+  return full_text
 
 
-def convert_pdf_to_str_list(pdf_file_path: str) -> List[str]:
-  doc = fitz.open(pdf_file_path)
+def convert_pdf_to_text(pdf_path, language_list=["en"], dpi=300) -> str:
+  """
+  Use EasyOCR to convert the given PDF file into plain text.
+  Returns a string, with pages separated by two newline characters.
+  """
+  pages = convert_pdf_to_str_list(pdf_path, language_list, dpi)
+  return "\n\n".join(pages)
 
-  zoom = 4
-  mat = fitz.Matrix(zoom, zoom)
 
-  reader = easyocr.Reader(["en"])
-
-  # List to store OCR results from all pages
-  pages_txt = []
-
-  # Loop through each page in the PDF
-  with tempfile.TemporaryDirectory() as tmpdirname:
-    for i in range(len(doc)):
-      val = f"{tmpdirname}/image_{i + 1}.png"
-
-      # Convert page to image
-      page = doc.load_page(i)
-      pix = page.get_pixmap(matrix=mat)
-      pix.save(val)
-
-      # Read text from the image
-      result = reader.readtext(val, detail=0)
-      pages_txt.append("\n".join(result))
-
-  doc.close()
-
-  return pages_txt
+# if __name__ == "__main__":
+#     # Specify the path to your PDF file
+#     indir = '../input_docs/'
+#     pdf_files = [indir+f for f in listdir(indir) if 'pdf' in str(f) and isfile(join(indir, f))]
+#     for pdf_file in pdf_files:
+#         extracted_text = extract_text_from_pdf(pdf_file)
+#         output_file = indir+'ocr_out/'+re.sub(".pdf$",".txt",basename(pdf_file))
+#         try:
+#             with open(output_file, 'w', encoding='utf-8') as file:
+#                 file.write(extracted_text)
+#                 print(f"Extraction saved to {output_file}")
+#         except Exception as e:
+#             print(f"Error while writing file: {e}")

@@ -12,7 +12,7 @@ dependencies = [
     "easyocr==1.7.1",
     "mavehgvs==0.6.1",
     "openai==1.55.3",
-    "pymupdf==1.24.4",
+    "pdf2image>=1.17.0",
     "python-dotenv==0.21.0",
     "requests>=2.32.3",
 ]

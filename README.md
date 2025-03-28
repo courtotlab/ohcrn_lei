@@ -40,6 +40,18 @@ It currently supports the following built-in extraction tasks:
 In addition to the built-in extraction tasks, additional tasks can also be provided via a task definition file (via the `-t` option). See [below](#task-definition-format) for the task definition file format requirements.
 
 ## Installation
+### OS dependencies ###
+OHCRN-LEI requires `poppler` to be installed. If you don't have `poppler` installed already, you can do so as follows:
+
+**MacOS:**
+```bash
+$ brew install poppler
+```
+**Debian/Ubuntu:**
+```bash
+$ sudo apt install poppler-utils
+```
+
 ### Preliminarily: ###
 We recommend installing `ohcrn-lei` via `uv`. If you don't have `uv`, you can install it from [here](https://docs.astral.sh/uv/#installation). (It only takes seconds!)
 
@@ -123,3 +135,6 @@ The following plugins are supported:
   * **regex_hgvsp** : Extracts protein-level HGVS strings using a regular expression search.
   * **regex_variants** : Extracts variant IDs (OMIM,dbSNP,etc.) using a regular expression search.
   * **regex_chromosome** : Extracts chromosome identifiers using a regular expression search.
+
+## Citation
+Coming soon.
