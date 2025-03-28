@@ -40,7 +40,7 @@ def get_protein_changes(text: str) -> List[str]:
   # p_multi_var = prot_regex.pro_multi_variant.replace(prot_regex.amino_acid, "(?:[A-Z][a-z]{2})")
   protein_rgx = r"(?:[Pp]\.)?(?:[A-Z][a-zA-Z]{2}\d+(?:[A-Z][a-z]{2}|fs\*\d*|del|ins|dup|delins|Ter)+\d*)(?:;(?:[A-Z][a-z]{2}\d+(?:[A-Z][a-z]{2}|fs\*\d*|del|ins|dup|delins|Ter)\d*))*?"
   pDNA = Enum("pDNA", [protein_rgx])
-
+  # FIXME: Eliminate sub-matches (see trie search)
   return get_matches(text, pDNA)
 
 

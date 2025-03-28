@@ -2,11 +2,11 @@ import pytest
 
 # Import the functions from your module.
 from ohcrn_lei.regex_utils import (
+  get_chromosomes,
   get_coding_changes,
   get_genomic_changes,
   get_protein_changes,
   get_variant_ids,
-  get_chromosomes,
 )
 
 # Helper tests for get_matches can be conducted indirectly via the functions below.
@@ -36,8 +36,11 @@ from ohcrn_lei.regex_utils import (
 )
 def test_get_coding_changes(text, expected):
   results = get_coding_changes(text)
-  for x, y in zip(results, expected):
-    assert x == y
+  # Since the order is unimportant, check that each expected value is in the results.
+  for ex in expected:
+    assert ex in results
+  # for x, y in zip(results, expected):
+  #   assert x == y
 
 
 def test_get_coding_changes_no_match():
@@ -61,8 +64,11 @@ def test_get_coding_changes_no_match():
 )
 def test_get_genomic_changes(text, expected):
   results = get_genomic_changes(text)
-  for x, y in zip(results, expected):
-    assert x == y
+  # Since the order is unimportant, check that each expected value is in the results.
+  for ex in expected:
+    assert ex in results
+  # for x, y in zip(results, expected):
+  #   assert x == y
 
 
 def test_get_genomic_changes_no_match():
