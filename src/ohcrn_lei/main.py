@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 from ohcrn_lei import task_parser
 from ohcrn_lei.cli import die, process_cli_args
@@ -39,12 +40,12 @@ def start() -> None:
   )
 
   if args.outfile == "-" or args.outfile == "stdout":
-    print(output)
+    print("\nResult output:\n")
+    json.dump(output, sys.stdout, indent=2)
   else:
     try:
       with open(args.outfile, "w") as fp:
-        # TODO: Look into pretty-print https://stackoverflow.com/questions/12943819/how-to-prettyprint-a-json-file
-        json.dump(output, fp)
+        json.dump(output, fp, indent=2)
     except Exception as e:
       die(f"Unable to write output file {args.outfile}.\n{e}", os.EX_IOERR)
     else:
