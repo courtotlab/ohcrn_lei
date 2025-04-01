@@ -154,6 +154,15 @@ prCat <- function(category) {
 #process all categories with that function
 allCategories |> sapply(prCat) -> prResult
 
+fixLabel <- function(tbl) {
+  dimnames(tbl) <- lapply(dimnames(tbl),function(x)sub("\n",".",x))
+  signif(100*tbl,digits=3)
+}
+
+cat("\nPrecision-Recall results:\n")
+print(fixLabel(prResult))
+write.table(fixLabel(prResult),paste0(outdir,"/pr_result.tsv"),sep="\t")
+
 # Convert result data into 3D-array with 3rd dimension representing OCR/nonOCR
 prResult3D <- array(NA,dim=c(3,3,2),dimnames=list(rownames(prResult),c("Report","Mol.Test","Variant"),c("OCR","No.OCR")))
 prResult3D[,,1] <- prResult[,c(2,4,6)]

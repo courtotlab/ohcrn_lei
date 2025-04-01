@@ -1,6 +1,6 @@
-import sys
 import json
 import re
+import sys
 
 args = sys.argv[1:]
 refJSON = args[0]
