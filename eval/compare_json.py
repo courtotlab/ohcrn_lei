@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import json
+import re
+import sys
+
 """
 compare_json.py compares JSON files containing the extraction
 results from OHCRN-LEI against a benchmark JSON file and counts
@@ -26,10 +30,6 @@ It is called by evaluation.sh
 First argument is the reference JSON, second argument is the
 JSON to be evaluated.
 """
-
-import json
-import re
-import sys
 
 args = sys.argv[1:]
 refJSON = args[0]
