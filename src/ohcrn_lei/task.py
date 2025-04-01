@@ -1,3 +1,21 @@
+"""
+OHCRN-LEI - LLM-based Extraction of Information
+Copyright (C) 2025 Ontario Institute for Cancer Research
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
 import os
 from typing import List
 
@@ -57,7 +75,7 @@ class Task:
     full_results = {}
 
     while i <= len(all_text) - (chunk_size - 1):
-      print("Processing pages", i, "to", i + chunk_size - 1)
+      print("Extracting from pages", i, "to", i + chunk_size - 1)
       pages_text = " ".join(all_text[i : i + chunk_size])
 
       # Prepare query

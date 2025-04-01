@@ -10,7 +10,9 @@
 </p>
 
 ## Status
-[![Python application](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml/badge.svg)](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml)
+[![Python application](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml/badge.svg)](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml) 
+![GitHub Release](https://img.shields.io/github/v/release/courtotlab/ohcrn_lei)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 ## Overview
 

@@ -1,3 +1,32 @@
+"""
+OHCRN-LEI - LLM-based Extraction of Information
+Copyright (C) 2025 Ontario Institute for Cancer Research
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
+"""
+compare_json.py compares JSON files containing the extraction
+results from OHCRN-LEI against a benchmark JSON file and counts
+TPs, FPs and FNs, which are then output as a TSV table.
+
+It is called by evaluation.sh
+
+First argument is the reference JSON, second argument is the
+JSON to be evaluated.
+"""
+
 import json
 import re
 import sys

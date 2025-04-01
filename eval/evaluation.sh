@@ -1,4 +1,24 @@
 #!/usr/bin/env bash
+: '
+OHCRN-LEI - LLM-based Extraction of Information
+Copyright (C) 2025 Ontario Institute for Cancer Research
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'
+
+# evaluation.sh evaluates the precision and recall of 
+# OHCRN-LEI on a set of example documents
 
 set -euo pipefail +H
 
@@ -54,8 +74,8 @@ for METHOD in manual ocr; do
   for TASK in report molecular_test variant; do
     mkdir -p "${METRICS_DIR}${METHOD}/${TASK}/"
     for OUT_JSON in "${OUT_DIR}${METHOD}/${TASK}/"*json; do
-      REFERENCE_JSON="${GS_DIR}${TASK}/$(basename ${OUT_JSON})"
-      METRICS_FILE="${METRICS_DIR}${METHOD}/${TASK}/$(basename ${OUT_JSON%.json}).tsv"
+      REFERENCE_JSON="${GS_DIR}${TASK}/$(basename "${OUT_JSON}")"
+      METRICS_FILE="${METRICS_DIR}${METHOD}/${TASK}/$(basename "${OUT_JSON%.json}").tsv"
       echo "Evaluating ${OUT_JSON}"
       python compare_json.py "${REFERENCE_JSON}" "${OUT_JSON}">"${METRICS_FILE}"
     done

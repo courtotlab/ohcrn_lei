@@ -1,5 +1,28 @@
 #!/usr/bin/env Rscript
 
+# OHCRN-LEI - LLM-based Extraction of Information
+# Copyright (C) 2025 Ontario Institute for Cancer Research
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# visualize.R visualizes the results of the evaluation.
+# It genereates a confusion matrix plot and a barplot 
+# showing precision, recall and F1 metrics.
+# First argument is the input directory (containing TSV files
+# produced by merge.R)
+# Second argument is the desired output directory.
+
 args <- commandArgs(TRUE)
 indir <- args[[1]]
 outdir <- args[[2]]

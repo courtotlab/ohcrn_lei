@@ -4,8 +4,11 @@ version = "0.2.0"
 description = "The ohcrn-lei tool takes a PDF or TXT file of a clinical report and extracts desired information from it, which will be output in json format."
 readme = "README.md"
 authors = [
-    { name = "Jochen Weile", email = "jweile@oicr.on.ca" }
+    { name = "Jochen Weile", email = "jweile@oicr.on.ca" },
+    { name = "Andres Melani de la Hoz", email = "amelanidelahoz@oicr.on.ca" }
 ]
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
 requires-python = ">=3.13"
 dependencies = [
     "argparse>=1.4.0",
