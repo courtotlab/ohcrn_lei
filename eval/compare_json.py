@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import json
 import re
 import sys
+from typing import List
 
 """
 compare_json.py compares JSON files containing the extraction
@@ -65,13 +66,13 @@ def forceList(x):
     return x
 
 
-def normalizeNames(xs):
+def normalizeNames(xs: List[str]) -> List[str]:
   """
   Normalizes strings and identifiers to a common format to make
   them more comparable by removing prefixes and brackets and
   converting them to all upper-case.
   """
-  out = []
+  out: List[str] = []
   for x in xs:
     # normalize hgvs by removing prefixes and brackets
     x = re.sub(r"Chr.+:g\.", "", x)
@@ -101,7 +102,7 @@ def normalizeNames(xs):
   return out
 
 
-def greedyPairOff(xs, ys):
+def greedyPairOff(xs: List, ys: List) -> dict:
   """
   Calculates the number of matches between two lists and outputs it
   together with the unmatched items of each input list.
@@ -136,7 +137,7 @@ def printTable(data: dict) -> None:
     print(rowname + "\t" + "\t".join(valStr))
 
 
-output = {}
+output: dict[str, dict] = {}
 for pageKey in refData:
   if pageKey not in testData:
     die("Missing page key!")

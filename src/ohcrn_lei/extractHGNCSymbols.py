@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import importlib.resources
 import os
 import re
-from typing import List
+from typing import List, Tuple
 
 import requests
 
@@ -118,7 +118,7 @@ def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
   return trie
 
 
-def eliminate_submatches(matches: dict[int, str]) -> dict[int, str]:
+def eliminate_submatches(matches: List[Tuple[int, str]]) -> List[Tuple[int, str]]:
   """
   Find all the submatches in the list of matches and remove them.
   E.g. "The gene is CHEK2." matches both "CHEK2" and "HE", but "HE" is

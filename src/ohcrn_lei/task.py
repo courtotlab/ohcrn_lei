@@ -40,6 +40,9 @@ class Task:
   run() executes the task on a given input file.
   """
 
+  prompt: str
+  plugins: dict | None
+
   def __init__(self, prompt: str):
     """
     Constructor to create a new task with an LLM prompt.

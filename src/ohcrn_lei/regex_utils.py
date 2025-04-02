@@ -19,34 +19,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import re
 
 # from mavehgvs.patterns import protein as prot_regex
-from enum import Enum
+# from enum import Enum
 from typing import List
 
 
 def get_coding_changes(text: str) -> List[str]:
-  cDNA = Enum(
-    "cDNA",
-    [
-      r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:[GCTAgcta])?>(?:[GCTAgcta])",
-      r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:[GCTAgcta])?=",
-      r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?)?(?:[GCTAgcta]+)?delins(?:[GCTAgcta]+)",
-      r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?)?del(?:[GCTAgcta]+)?",
-      r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?ins(?:[GCTAgcta]+)",
-      r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?inv",
-      r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?)?dup(?:[GCTAgcta]+)?",
-    ],
-  )
+  cDNA = [
+    r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:[GCTAgcta])?>(?:[GCTAgcta])",
+    r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:[GCTAgcta])?=",
+    r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?)?(?:[GCTAgcta]+)?delins(?:[GCTAgcta]+)",
+    r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?)?del(?:[GCTAgcta]+)?",
+    r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?ins(?:[GCTAgcta]+)",
+    r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?inv",
+    r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:_(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?)?dup(?:[GCTAgcta]+)?",
+  ]
 
   return get_matches(text, cDNA)
 
 
 def get_genomic_changes(text: str) -> List[str]:
-  gDNA = Enum(
-    "gDNA",
-    [
-      r"g\.\d+(?:_\d+)?(?:[A-Za-z]*>[A-Za-z]*|(?:del|dup|ins|inv|delins)?[A-Za-z0-9]*)?"
-    ],
-  )
+  gDNA = [
+    r"g\.\d+(?:_\d+)?(?:[A-Za-z]*>[A-Za-z]*|(?:del|dup|ins|inv|delins)?[A-Za-z0-9]*)?"
+  ]
   return get_matches(text, gDNA)
 
 
@@ -56,19 +50,21 @@ def get_protein_changes(text: str) -> List[str]:
   # Protein patterns taken from https://github.com/VariantEffect/mavehgvs/blob/main/src/mavehgvs/patterns/protein.py
   # p_single_var = prot_regex.pro_single_variant.replace(prot_regex.amino_acid, "(?:[A-Z][a-z]{2})")
   # p_multi_var = prot_regex.pro_multi_variant.replace(prot_regex.amino_acid, "(?:[A-Z][a-z]{2})")
-  protein_rgx = r"(?:[Pp]\.)?(?:[A-Z][a-zA-Z]{2}\d+(?:[A-Z][a-z]{2}|fs\*\d*|del|ins|dup|delins|Ter)+\d*)(?:;(?:[A-Z][a-z]{2}\d+(?:[A-Z][a-z]{2}|fs\*\d*|del|ins|dup|delins|Ter)\d*))*?"
-  pDNA = Enum("pDNA", [protein_rgx])
+  pDNA = [
+    r"(?:[Pp]\.)?(?:[A-Z][a-zA-Z]{2}\d+(?:[A-Z][a-z]{2}|fs\*\d*|del|ins|dup|delins|Ter)+\d*)(?:;(?:[A-Z][a-z]{2}\d+(?:[A-Z][a-z]{2}|fs\*\d*|del|ins|dup|delins|Ter)\d*))*?"
+  ]
+  # pDNA = Enum("pDNA", [protein_rgx])
   # FIXME: Eliminate sub-matches (see trie search)
   return get_matches(text, pDNA)
 
 
-def get_matches(text: str, change_type: Enum) -> List[str]:
+def get_matches(text: str, change_type: List[str]) -> List[str]:
   # out = []
   # for regex in change_type:
   #   temp = re.findall(regex.name, text)
   #   out.extend(temp)
 
-  out = [m for rgx in change_type for m in re.findall(rgx.name, text)]
+  out = [m for rgx in change_type for m in re.findall(rgx, text)]
 
   # remove duplicates
   out = list(set(out))

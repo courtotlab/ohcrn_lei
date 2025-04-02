@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 from typing import List
 
-import easyocr
+import easyocr  # type: ignore
 import numpy as np
 from pdf2image import convert_from_path
 

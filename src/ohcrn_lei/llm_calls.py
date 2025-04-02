@@ -38,6 +38,6 @@ def call_gpt_api(
     ],
   )
 
-  response_json = json.loads(chat_completion.choices[0].message.content)
+  response_json = json.loads(str(chat_completion.choices[0].message.content))
 
   return response_json
