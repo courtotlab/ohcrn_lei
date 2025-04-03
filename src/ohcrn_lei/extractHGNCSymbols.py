@@ -29,7 +29,14 @@ from ohcrn_lei.trieSearch import Trie
 
 def filterAliases(symbols: List[str]) -> List[str]:
   """
-  Only allow aliases that have at least one uppercase character followed by a number and a length of at least 3
+  Only allow aliases that have at least one uppercase character followed by a number
+  and a length of at least 3
+
+  Args:
+    symbols: List of gene symbols to filter
+
+  Returns:
+    A filtered list of gene symbols that match the criteria.
   """
   return [s for s in symbols if len(s) > 2 and re.search(r"[A-Z][0-9]", s)]
 
@@ -38,6 +45,12 @@ def parse_HGNC_from_URL(hgnc_url: str) -> Trie:
   """
   Read HGNC definitions file, pull all gene symbols from it
   and feed them into a search Trie.
+
+  Args:
+    hgnc_url: The URL of the HGNC gene symbol definition file.
+
+  Returns:
+    A trie loaded with all valid gene symbols.
   """
   # Create an empty trie
   trie = Trie()
@@ -76,6 +89,13 @@ def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
   Trie to load a serialized search Trie for HGNC gene symbols from a given cache file.
   If it doesn't exist, build a new Trie from the HGNC source on the internet,
   serialize it and store it in the cache file.
+
+  Args:
+    trieFile: the path to a file where the serialized Trie is (or will be) located.
+    hgnc_url: The URL to the HGNC gene name definition file.
+
+  Returns:
+    A trie of all HGNC gene symbols
   """
   # First, try to load from package internal data
   try:
@@ -98,6 +118,7 @@ def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
         trie = Trie.deserialize(serialized)
         print("Gene symbol Trie read from file.")
     except Exception as e:
+      # FIXME: We don't need to kill the program here, since we still have a fallback
       die(f"Error while reading file {e}", os.EX_IOERR)
     except ValueError as e:
       die(f"HGNC-Trie file has invalid format: {e}", os.EX_DATAERR)
@@ -123,6 +144,12 @@ def eliminate_submatches(matches: List[Tuple[int, str]]) -> List[Tuple[int, str]
   Find all the submatches in the list of matches and remove them.
   E.g. "The gene is CHEK2." matches both "CHEK2" and "HE", but "HE" is
   a submatch of CHEK2 and would thus be discarded.
+
+  Args:
+    matches: A list of tuples for each match, containing the index and matching string
+
+  Returns:
+    A filtered list of match tuples, as above.
   """
   submatches = set()
   for i in range(len(matches)):
@@ -142,7 +169,13 @@ def eliminate_submatches(matches: List[Tuple[int, str]]) -> List[Tuple[int, str]
 
 def find_HGNC_symbols(text: str) -> List[str]:
   """
-  Finds all HGNC gene symbols in a given piece of text
+  Finds all HGNC gene symbols in a given piece of text.
+
+  Args:
+    A text string to be searched for gene symbols
+
+  Returns:
+    The list of all gene symbols found in the text.
   """
   # Load Trie of HGNC symbols
   hgnc_url = "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/non_alt_loci_set.txt"

@@ -16,18 +16,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import argparse
 import sys
+from argparse import ArgumentParser, Namespace
 
 
 # helper function to exit with error message
-def die(msg, code=1):
-  print("🛑 ERROR: " + msg, file=sys.stderr)
+def die(msg: str, code=1) -> None:
+  """
+  Prints a message to stderr and exits the program with the given code
+
+  Args:
+    msg: message to print
+    code: exit code
+  """
+  print("❌ ERROR: " + msg, file=sys.stderr)
   sys.exit(code)
 
 
-def process_cli_args():
-  parser = argparse.ArgumentParser(description="Extract data from report file.")
+def process_cli_args() -> tuple[ArgumentParser, Namespace]:
+  """
+  Processes the command line arguments
+
+  Returns:
+    A tuple containing the argument parser object and a dictionary of the arguments by name
+  """
+  parser = ArgumentParser(description="Extract data from report file.")
   parser.add_argument(
     "-b",
     "--page-batch",

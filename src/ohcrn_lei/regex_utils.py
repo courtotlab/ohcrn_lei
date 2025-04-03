@@ -24,6 +24,15 @@ from typing import List
 
 
 def get_coding_changes(text: str) -> List[str]:
+  """
+  Extract coding HGVS strings via regex
+
+  Args:
+    text: input text
+
+  Returns:
+    A list of HGVS strings found in the text.
+  """
   cDNA = [
     r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:[GCTAgcta])?>(?:[GCTAgcta])",
     r"[cC]\.(?:\d+|\*\d+|-\d+)(?:[+-]\d+)?(?:[GCTAgcta])?=",
@@ -38,6 +47,15 @@ def get_coding_changes(text: str) -> List[str]:
 
 
 def get_genomic_changes(text: str) -> List[str]:
+  """
+  Extract genomic HGVS strings via regex
+
+  Args:
+    text: input text
+
+  Returns:
+    A list of HGVS strings found in the text.
+  """
   gDNA = [
     r"g\.\d+(?:_\d+)?(?:[A-Za-z]*>[A-Za-z]*|(?:del|dup|ins|inv|delins)?[A-Za-z0-9]*)?"
   ]
@@ -45,6 +63,15 @@ def get_genomic_changes(text: str) -> List[str]:
 
 
 def get_protein_changes(text: str) -> List[str]:
+  """
+  Extract protein HGVS strings via regex
+
+  Args:
+    text: input text
+
+  Returns:
+    A list of HGVS strings found in the text.
+  """
   # Replace the predefined aminoacid codes for a more general regex
   # that matches one capital letter followed by two lower ones
   # Protein patterns taken from https://github.com/VariantEffect/mavehgvs/blob/main/src/mavehgvs/patterns/protein.py
@@ -59,6 +86,16 @@ def get_protein_changes(text: str) -> List[str]:
 
 
 def get_matches(text: str, change_type: List[str]) -> List[str]:
+  """
+  Find matches in a text string given a list of regexes
+
+  Args:
+    text: Input text
+    change_type: A list of regexes to extract
+
+  Returns:
+    A list of matches
+  """
   # out = []
   # for regex in change_type:
   #   temp = re.findall(regex.name, text)
@@ -73,6 +110,15 @@ def get_matches(text: str, change_type: List[str]) -> List[str]:
 
 
 def get_variant_ids(text: str) -> List[str]:
+  """
+  Extract variant IDs strings via regex
+
+  Args:
+    text: input text
+
+  Returns:
+    A list of variant IDs found in the text.
+  """
   var_id_regex = [
     r"(?:OMIM)(?:\s*[:#])?\s*\d+",
     r"(?:Clinvar:)?([SRV]CV[A-Z0-9]{9})",
@@ -91,6 +137,15 @@ def get_variant_ids(text: str) -> List[str]:
 
 
 def get_chromosomes(text: str) -> List[str]:
+  """
+  Extract chromosome labels via regex
+
+  Args:
+    text: input text
+
+  Returns:
+    A list of chromosome labels found in the text.
+  """
   chromosome_regex = r"^Chr([1-9]|1[0-9]|2[0-2]|X|Y)$"
   chrom_results = re.findall(chromosome_regex, text)
 

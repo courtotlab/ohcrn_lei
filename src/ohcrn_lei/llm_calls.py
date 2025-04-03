@@ -22,8 +22,21 @@ from openai import OpenAI
 
 
 def call_gpt_api(
-  system_msg: str, query: str, model_used: str, mock: bool = False
+  system_msg: str, query: str, model_used="gpt-4o", mock: bool = False
 ) -> dict:
+  """
+  Calls the GPT4o API with a given system message and query string.
+
+  Args:
+    system_msg: The system-message part of the LLM prompt
+    query: The query part of the LLM prompt.
+    model_used: The LLM model to use
+    mock: Whether to skip this query and produce a mock output instead. (for debugging / unit tests)
+
+  Returns:
+    A dictionary representation of the JSON output produced by the LLM
+  """
+
   if mock:
     return {"output": "mock"}
 

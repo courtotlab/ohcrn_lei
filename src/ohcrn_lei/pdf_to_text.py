@@ -26,10 +26,18 @@ from pdf2image import convert_from_path
 from ohcrn_lei.cli import die
 
 
-def convert_pdf_to_str_list(pdf_path, language_list=["en"], dpi=300) -> List[str]:
+def convert_pdf_to_str_list(pdf_path: str, language_list=["en"], dpi=300) -> List[str]:
   """
   Use EasyOCR to convert the given PDF file into plain text but page by page.
   Returns a list of strings representing each page.
+
+  Args:
+    pdf_path: path to the pdf input file
+    language_list: A list of languages to detect for OCR
+    dpi: The scan resolution to use for OCR
+
+  Returns:
+    A list of text strings representing the document pages
   """
   # Initialize the EasyOCR reader.
   reader = easyocr.Reader(language_list)
@@ -61,10 +69,18 @@ def convert_pdf_to_str_list(pdf_path, language_list=["en"], dpi=300) -> List[str
   return full_text
 
 
-def convert_pdf_to_text(pdf_path, language_list=["en"], dpi=300) -> str:
+def convert_pdf_to_text(pdf_path: str, language_list=["en"], dpi=300) -> str:
   """
   Use EasyOCR to convert the given PDF file into plain text.
   Returns a string, with pages separated by two newline characters.
+
+  Args:
+    pdf_path: path to the pdf input file
+    language_list: A list of languages to detect for OCR
+    dpi: The scan resolution to use for OCR
+
+  Returns:
+    A text string of the OCR result.
   """
   pages = convert_pdf_to_str_list(pdf_path, language_list, dpi)
   return "\n\n".join(pages)

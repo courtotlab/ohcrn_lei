@@ -25,6 +25,10 @@ from ohcrn_lei.cli import die, process_cli_args
 
 
 def start() -> None:
+  """
+  Main entry point for ohcrn-lei.
+  """
+
   # print license header
   print(
     """
