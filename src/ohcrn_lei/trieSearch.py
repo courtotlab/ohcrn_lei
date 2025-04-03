@@ -104,7 +104,9 @@ class Trie:
     return serialize_node(self.root)
 
   @staticmethod
-  def deserialize(s: str):  # FIXME: Static method cannot return "Self" or "Trie"
+  def deserialize(
+    s: str,
+  ) -> "Trie":
     """
     Deserializes the string 's' to reconstruct a Trie.
     Returns a new Trie object.
