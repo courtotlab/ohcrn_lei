@@ -82,6 +82,7 @@ def test_serialization_and_deserialization():
   trie = create_sample_trie(words)
 
   serialized = trie.serialize()
+  print(serialized)
   new_trie = Trie.deserialize(serialized)
 
   # Test that search_in_text returns the same matches in a given text.
