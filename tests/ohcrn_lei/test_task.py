@@ -167,6 +167,32 @@ def test_run_with_plugins(tmp_path, fake_llm_calls, fake_pdf_convert, fake_plugi
     assert res.get("result") == DUMMY_LLM_RESULT["result"]
 
 
+def test_run_with_overwriting_plugin(
+  tmp_path, fake_llm_calls, fake_pdf_convert, fake_plugins
+):
+  # This won't really be used. Will be ignored by monkeypatch rule
+  file_path = str(tmp_path / "dummy.pdf")
+
+  prompt = "Extract data"
+  task_obj = Task(prompt)
+  # Set plugins for several operations.
+  plugins = {"result": "trie_hgnc"}
+  task_obj.set_plugins(plugins)
+
+  # Run with OCR (default)
+  result = task_obj.run(file_path, chunk_size=2, no_ocr=False, llm_mock=True)
+
+  # We expect two chunks since we have three pages with chunk_size=2.
+  expected_keys = ["Pages 1-2", "Pages 3-4"]
+  for key in expected_keys:
+    assert key in result
+    # llm result data from our fake call plus plugin fields.
+    res = result[key]
+    # Also, the dummy llm result should be present.
+    expected_value = [DUMMY_LLM_RESULT["result"]] + PLUGIN_RESULTS["trie_hgnc"]
+    assert res.get("result") == expected_value
+
+
 def test_run_invalid_plugin(tmp_path):
   # Create a temporary text file.
   content = "Test content for invalid plugin."
@@ -199,3 +225,14 @@ def test_read_file_failure(monkeypatch):
     task_obj.convert_txt_to_str_list("nonexistent.txt")
   # Check that the exit code is os.EX_IOERR.
   assert excinfo.value.code == os.EX_IOERR
+
+
+def test_integrateResults():
+  prompt = "Test exit on file read error"
+  task_obj = Task(prompt)
+  xs = [1, 2, 2, 3]
+  ys = [1, 2, 4]
+  out = task_obj.integrateResults(xs, ys)
+  expected = [1, 2, 2, 3, 4]
+  assert len(out) == len(expected)
+  assert all(x == y for x, y in zip(out, expected))
