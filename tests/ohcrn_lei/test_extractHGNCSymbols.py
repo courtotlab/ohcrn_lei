@@ -1,3 +1,21 @@
+"""
+OHCRN-LEI - LLM-based Extraction of Information
+Copyright (C) 2025 Ontario Institute for Cancer Research
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
 import io
 
 import pytest
@@ -6,6 +24,7 @@ import requests
 from ohcrn_lei.extractHGNCSymbols import (
   eliminate_submatches,
   filterAliases,
+  find_HGNC_symbols,
   load_or_build_Trie,
   parse_HGNC_from_URL,
 )
@@ -13,6 +32,16 @@ from ohcrn_lei.trieSearch import Trie
 
 # ----------------------------------------------------------------------
 # Helpers / Mocks
+
+FAKE_URL = "https://localhost/fakeURL"
+GENES = ["MTHFR", "CHEK2", "UBE2I"]
+TEST_TEXT = "We found variants in MTHFR, CHEK2 and UBE2I. NoMatch"
+FAKE_TSV = (
+  "hgnc_id\tsymbol\tcol3\tcol4\tcol5\tcol6\tcol7\tcol8\taliases\tcol10\tlegacy\n"
+  'HGNC:1\tMTHFR\t-\t-\t-\t-\t-\t-\t\t-\t"NoMatch"\n'
+  "HGNC:2\tCHEK2\t-\t-\t-\t-\t-\t-\t\t-\t\n"
+  'HGNC:2\tUBC6\t-\t-\t-\t-\t-\t-\t"UBE2I|NoMatch"\t-\t\n'
+)
 
 
 class FakeResponse:
@@ -39,26 +68,6 @@ class FakeResponse:
     self._io.close()
 
 
-# # Simulate a bad HTTP request by making raise_for_status() raise an exception.
-# class BadResponse:
-#     def __init__(self):
-#         self.status_code = 404
-
-#     def raise_for_status(self):
-#         raise requests.exceptions.HTTPError("Not Found")
-
-#     def iter_lines(self, decode_unicode=False):
-#         return iter([])
-
-#     def __enter__(self):
-#         return self
-
-#     def __exit__(self, *args):
-#         pass
-# ----------------------------------------------------------------------
-# Tests for filterAliases
-
-
 def test_filterAliases_valid_and_invalid():
   # Valid alias must have length > 2 and at least one uppercase letter immediately followed by a number.
   valid = "A1B"  # has A1
@@ -76,37 +85,20 @@ def test_filterAliases_valid_and_invalid():
 
 
 def test_parse_HGNC_from_URL(monkeypatch):
-  # Prepare a fake TSV file stream. We include a header and two valid lines.
-  fake_tsv = (
-    "hgnc_id\tsymbol\tcol3\tcol4\tcol5\tcol6\tcol7\tcol8\taliases\tcol10\tlegacy\n"
-    'HGNC:1\tGENE1\t-\t-\t-\t-\t-\t-\t"AL1|ab2|X1Y2"\t-\t"LEG1|lm3"\n'
-    'HGNC:2\tGENE2\t-\t-\t-\t-\t-\t-\t"B2C|D3E"\t-\t\n'
-  )
-
   # Create a fake response
   def fake_get(*args, **kwargs):
-    return FakeResponse(fake_tsv)
+    return FakeResponse(FAKE_TSV)
 
   # monkeypatch.setattr(requests, "get", fake_get)
   monkeypatch.setattr("ohcrn_lei.extractHGNCSymbols.requests.get", fake_get)
 
   # Call the function. It will create a Trie and insert symbols.
-  trie = parse_HGNC_from_URL("https://fake-url-for-test")
+  trie = parse_HGNC_from_URL(FAKE_URL)
   # Check that the official symbols are inserted.
-  # The official symbols are in column 2. Also aliases and legacy names are inserted if they pass the filter.
-  # From first line: official: "GENE1"
-  #   aliases: "AL1", "ab2", "X1Y2" -> apply filterAliases: "AL1" (has A1), "X1Y2" (has X1 or Y2) but "ab2" fails (no uppercase letter)
-  #   legacy: "LEG1", "lm3" -> "LEG1" is valid, "lm3" is not.
-  # From second line: official: "GENE2"; aliases: "B2C", "D3E" are valid if they match pattern:
-  #   "B2C" : B2 is ok; "D3E": D3 is ok.
-  #
-  # Now verify (we assume Trie has a search or contains method).
-  # For testing, we can re-serialize the trie and check whether the expected symbols exist by doing a search_in_text on a string that will match precisely them.
-  test_text = " ".join(["GENE1", "AL1", "X1Y2", "LEG1", "GENE2", "B2C", "D3E"])
-  matches = trie.search_in_text(test_text)
+  matches = trie.search_in_text(TEST_TEXT)
   found = {match for (_, match) in matches}
-  expected = {"GENE1", "AL1", "X1Y2", "LEG1", "GENE2", "B2C", "D3E"}
-  assert expected.issubset(found)
+  for gene in GENES:
+    assert gene in found
 
 
 def test_parse_HGNC_from_URL_bad_response(monkeypatch):
@@ -116,7 +108,7 @@ def test_parse_HGNC_from_URL_bad_response(monkeypatch):
   monkeypatch.setattr("ohcrn_lei.extractHGNCSymbols.requests.get", fake_get)
 
   with pytest.raises(SystemExit):
-    parse_HGNC_from_URL("https://fake-error-url")
+    parse_HGNC_from_URL(FAKE_URL)
 
 
 # ----------------------------------------------------------------------
@@ -153,136 +145,87 @@ def test_eliminate_submatches_multiple():
 # ----------------------------------------------------------------------
 # Tests for load_or_build_Trie and find_HGNC_symbols
 #
-# Since these functions interact with filesystem and package resources, we will simulate those.
-#
 
 
-# Fake Trie serialization/deserialization:
-class FakeTrie(Trie):
-  def __init__(self):
-    super().__init__()
-    self.words = set()
-
-  def insert(self, word: str):
-    self.words.add(word)
-
-  def serialize(self):
-    # We'll use a simple comma separated string
-    return ",".join(sorted(self.words))
-
-  @classmethod
-  def deserialize(cls, data: str):
-    trie = cls()
-    if data.strip() == "":
-      raise ValueError("Empty trie")
-    for word in data.split(","):
-      trie.insert(word)
-    return trie
-
-  # For search_in_text we implement a simple lookup:
-  def search_in_text(self, text: str):
-    matches = []
-    # For each inserted word, if it occurs in text, record the first position.
-    for word in self.words:
-      pos = text.find(word)
-      if pos >= 0:
-        matches.append((pos, word))
-    return matches
+def test_load_or_build_Trie_load_internal(tmp_path):
+  # non-existing tree file and fake URL require it to solely rely on the internal file
+  fakeFile = tmp_path / "testTree.txt"
+  trie = load_or_build_Trie(fakeFile, FAKE_URL)
+  matches = trie.search_in_text(TEST_TEXT)
+  found = [m for _, m in matches]
+  for gene in GENES:
+    assert gene in found
 
 
-# Monkeypatch the Trie in our functions to use FakeTrie.
-# @pytest.fixture(autouse=True)
-# def patch_trie(monkeypatch):
-#     monkeypatch.setattr("ohcrn_lei.trieSearch.Trie", FakeTrie)
+def test_load_or_build_Trie_load_local(monkeypatch, tmp_path):
+  # Test the case where internal resource fails, but local file exists.
 
+  # First, force importlib.resources.files to raise an Exception.
+  monkeypatch.setattr(
+    "ohcrn_lei.extractHGNCSymbols.importlib.resources.files",
+    lambda pkg: (_ for _ in ()).throw(Exception("Fake Exception")),
+  )
+  # Also provide a fake URL so re-building fails
+  # Create a temporary file with a valid serialized Trie.
+  trie = Trie()
+  for gene in GENES:
+    trie.insert(gene)
+  serialized = trie.serialize()
+  trie_file = tmp_path / "hgncTrie.txt"
+  trie_file.write_text(serialized, encoding="utf-8")
 
-def test_load_or_build_Trie_load_internal(monkeypatch, tmp_path):
-  trieFile = tmp_path / "testTree.txt"
-  trie = load_or_build_Trie(trieFile, "https://localhost/fakeURL")
+  # test the actual method
+  trie = load_or_build_Trie(str(trie_file), FAKE_URL)
+
+  # validate that the resulting trie works
   text = "We found variants in MTHFR, CHEK2 and UBE2I."
   matches = trie.search_in_text(text)
-  matches_words = [m for _, m in matches]
-  expected = ["MTHFR", "CHEK2", "UBE2I"]
-  for ex in expected:
-    assert ex in matches_words
+  found = {word for (_, word) in matches}
+  for gene in GENES:
+    assert gene in found
 
 
-# def test_load_or_build_Trie_load_local(monkeypatch, tmp_path):
-#     # Test the case where internal resource fails, but local file exists.
-#     # First, force importlib.resources.files to raise an Exception.
-#     monkeypatch.setattr(
-#         "ohcrn_lei.extractHGNCSymbols.importlib.resources.files",
-#         lambda pkg: (_ for _ in ()).throw(Exception("Resource not found")),
-#     )
-#     # Create a temporary file with a valid serialized Trie.
-#     fake_trie = FakeTrie()
-#     fake_trie.insert("GENE_LOCAL")
-#     serialized = fake_trie.serialize()
-#     trie_file = tmp_path / "hgncTrie.txt"
-#     trie_file.write_text(serialized, encoding="utf-8")
-#     # Monkeypatch os.path.exists to return True when checking for the temporary file.
-#     # monkeypatch.setattr(os, "path", SimpleNamespace(exists=lambda x: x == str(trie_file)))
+def test_load_or_build_Trie_build_from_URL(monkeypatch, tmp_path):
+  # Test the fallback: neither internal nor local file loaded, so build from URL.
+  # Make internal resource fail.
+  monkeypatch.setattr(
+    "ohcrn_lei.extractHGNCSymbols.importlib.resources.files",
+    lambda pkg: (_ for _ in ()).throw(Exception("Resource not found")),
+  )
+  # Use non-existing temporary file to fail local file test and later cache.
+  trie_file = tmp_path / "hgncTrie.txt"
 
-#     # Patch open to use the temporary file.
-#     original_open = open
-#     def fake_open(filepath, mode="r", encoding=None):
-#         if filepath == str(trie_file):
-#             return original_open(filepath, mode, encoding=encoding)
-#         else:
-#             return original_open(filepath, mode, encoding=encoding)
-#     monkeypatch.setattr("ohcrn_lei.extractHGNCSymbols.open", fake_open)
+  def fake_get(*args, **kwargs):
+    return FakeResponse(FAKE_TSV)
 
-#     trie = load_or_build_Trie(str(trie_file), "https://fake-url")
-#     matches = trie.search_in_text("GENE_LOCAL")
-#     found = {word for (pos, word) in matches}
-#     assert "GENE_LOCAL" in found
+  monkeypatch.setattr("ohcrn_lei.extractHGNCSymbols.requests.get", fake_get)
 
-# def test_load_or_build_Trie_build_from_URL(monkeypatch, tmp_path):
-#     # Test the fallback: neither internal nor local file loaded, so build from URL.
-#     # Make internal resource fail.
-#     monkeypatch.setattr(
-#         "ohcrn_lei.extractHGNCSymbols.importlib.resources.files",
-#         lambda pkg: (_ for _ in ()).throw(Exception("Resource not found")),
-#     )
-#     # Force os.path.exists to return False for the local file.
-#     # monkeypatch.setattr(os, "path", SimpleNamespace(exists=lambda x: False))
+  # test the actual method
+  trie = load_or_build_Trie(str(trie_file), FAKE_URL)
 
-#     # Prepare a fake TSV file as in earlier test.
-#     fake_tsv = (
-#         "hgnc_id\tsymbol\tcol3\tcol4\tcol5\tcol6\tcol7\tcol8\taliases\tcol10\tlegacy\n"
-#         "HGNC:3\tGENE_URL\t-\t-\t-\t-\t-\t-\t\"AL3|NoMatch\"\t-\t\"LEG3\"\n"
-#     )
-#     def fake_get(*args, **kwargs):
-#         return FakeResponse(fake_tsv)
-#     monkeypatch.setattr(requests, "get", fake_get)
+  # validate
+  matches = trie.search_in_text(TEST_TEXT)
+  found = {word for (_, word) in matches}
+  assert "NoMatch" not in found
+  for gene in GENES:
+    assert gene in found
 
-#     # Use a temporary file as cache.
-#     trie_file = tmp_path / "hgncTrie.txt"
-#     trie = load_or_build_Trie(str(trie_file), "https://fake-hgnc-url")
-#     # Check that the newly built trie contains the official and valid alias/legacy symbols.
-#     # Official: GENE_URL; aliases: "AL3" is valid; "NoMatch" likely fails if pattern not met (no uppercase letter followed by a digit? Actually, "N o" is not digit)
-#     # legacy: "LEG3" is valid.
-#     text = "GENE_URL AL3 LEG3"
-#     matches = trie.search_in_text(text)
-#     found = {word for (pos, word) in matches}
-#     expected = {"GENE_URL", "AL3", "LEG3"}
-#     assert expected.issubset(found)
-#     # Also, check that the file was written (i.e. cache exists)
-#     assert trie_file.read_text(encoding="utf-8").strip() != ""
 
-# def test_find_HGNC_symbols(monkeypatch, tmp_path):
-#     # For find_HGNC_symbols, force load_or_build_Trie to use our FakeTrie with controlled content.
-#     fake_trie = FakeTrie()
-#     # Insert some gene symbols.
-#     fake_trie.insert("GENE_A")
-#     fake_trie.insert("GENE_B")
-#     # Monkeypatch load_or_build_Trie (in our module) to return our fake_trie.
-#     monkeypatch.setattr("ohcrn_lei.extractHGNCSymbols.load_or_build_Trie", lambda file, url: fake_trie)
-#     # Also, patch parse_HGNC_from_URL in case it is called.
-#     monkeypatch.setattr("ohcrn_lei.extractHGNCSymbols.parse_HGNC_from_URL", lambda url: fake_trie)
+def test_find_HGNC_symbols(monkeypatch, tmp_path):
+  # For find_HGNC_symbols, force load_or_build_Trie to use our FakeTrie with controlled content.
+  trie = Trie()
+  # Insert some gene symbols.
+  for gene in GENES:
+    trie.insert(gene)
+  # Monkeypatch load_or_build_Trie (in our module) to return our fake_trie.
+  monkeypatch.setattr(
+    "ohcrn_lei.extractHGNCSymbols.load_or_build_Trie", lambda file, url: trie
+  )
+  # Also, patch parse_HGNC_from_URL in case it is called.
+  monkeypatch.setattr(
+    "ohcrn_lei.extractHGNCSymbols.parse_HGNC_from_URL", lambda url: trie
+  )
 
-#     text = "This text contains GENE_A, something else and GENE_B."
-#     result = find_HGNC_symbols(text)
-#     # Since our FakeTrie.search_in_text is simple, it will return matches if the gene symbol appears.
-#     assert "GENE_A" in result
-#     assert "GENE_B" in result
+  found = find_HGNC_symbols(TEST_TEXT)
+  for gene in GENES:
+    assert gene in found

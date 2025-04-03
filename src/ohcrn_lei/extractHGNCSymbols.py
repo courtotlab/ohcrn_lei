@@ -97,6 +97,8 @@ def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
   Returns:
     A trie of all HGNC gene symbols
   """
+  trie = None
+  serialized = None
   # First, try to load from package internal data
   try:
     resource_file = importlib.resources.files("ohcrn_lei") / "data" / "hgncTrie.txt"

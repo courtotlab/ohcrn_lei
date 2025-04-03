@@ -63,7 +63,7 @@ def convert_pdf_to_str_list(pdf_path: str, language_list=["en"], dpi=300) -> Lis
       full_text.append(page_text)
     except Exception as e:
       die(
-        f"Failed processing page {i + 1}: {e}",
+        f"Failed processing page {i + 1}: {e}",os.EX_DATAERR
       )
 
   return full_text
