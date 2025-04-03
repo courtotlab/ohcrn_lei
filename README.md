@@ -69,15 +69,11 @@ $ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ### Installation ###
 **Preliminarily:**
-
-  1. Download the wheel (`.whl`) file from the [latest release](https://github.com/courtotlab/ohcrn_lei/releases)
-  2. Install the wheel file via `uv`.
-
+Install directly from github via `uv`:
 ```bash
-# substitute the link below with the latest release
-$ wget 'https://github.com/courtotlab/ohcrn_lei/releases/download/v0.2.0/ohcrn_lei-0.1.0-py3-none-any.whl'
-$ uv tool install ohcrn_lei-0.1.0-py3-none-any.whl
+$ uv tool install "ohcrn-lei @ git+https://github.com/courtotlab/ohcrn_lei"
 ```
+<!-- 
 **🚧🚧 After deployment on pypi becomes available: 🚧🚧**
 
 With `uv` (fastest and easiest, if available):
@@ -89,7 +85,7 @@ With `pip` (slower):
 ```bash
 # This will require python 3.13 or higher to be installed!
 pipx install --user ohcrn_lei
-```
+``` -->
 
 ### Usage
 After installation, you can run the `ohcrn-lei` in your command line. For example, to run the `report` extraction task on the file `example.pdf`, run:
