@@ -17,9 +17,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import re
-
-# from mavehgvs.patterns import protein as prot_regex
-# from enum import Enum
 from typing import List
 
 
@@ -75,12 +72,12 @@ def get_protein_changes(text: str) -> List[str]:
   # Replace the predefined aminoacid codes for a more general regex
   # that matches one capital letter followed by two lower ones
   # Protein patterns taken from https://github.com/VariantEffect/mavehgvs/blob/main/src/mavehgvs/patterns/protein.py
+  # from mavehgvs.patterns import protein as prot_regex
   # p_single_var = prot_regex.pro_single_variant.replace(prot_regex.amino_acid, "(?:[A-Z][a-z]{2})")
   # p_multi_var = prot_regex.pro_multi_variant.replace(prot_regex.amino_acid, "(?:[A-Z][a-z]{2})")
   pDNA = [
     r"(?:[Pp]\.)?(?:[A-Z][a-zA-Z]{2}\d+(?:[A-Z][a-z]{2}|fs\*\d*|del|ins|dup|delins|Ter)+\d*)(?:;(?:[A-Z][a-z]{2}\d+(?:[A-Z][a-z]{2}|fs\*\d*|del|ins|dup|delins|Ter)\d*))*?"
   ]
-  # pDNA = Enum("pDNA", [protein_rgx])
   # FIXME: Eliminate sub-matches (see trie search)
   return get_matches(text, pDNA)
 
@@ -96,11 +93,6 @@ def get_matches(text: str, change_type: List[str]) -> List[str]:
   Returns:
     A list of matches
   """
-  # out = []
-  # for regex in change_type:
-  #   temp = re.findall(regex.name, text)
-  #   out.extend(temp)
-
   out = [m for rgx in change_type for m in re.findall(rgx, text)]
 
   # remove duplicates

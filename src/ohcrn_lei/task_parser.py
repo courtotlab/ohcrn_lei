@@ -25,7 +25,7 @@ from ohcrn_lei.cli import die
 from ohcrn_lei.task import Task
 
 
-# FIXME: Handle usage printing in cli.py somehow instead.
+# HACK: Handle usage printing in cli.py somehow instead.
 def load_task(taskname: str, print_usage: Callable[[], None]) -> Task:
   """
   Load a task by name. The name can either be
