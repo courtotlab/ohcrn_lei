@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -16,6 +15,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from typing import List, Tuple
+
 
 class TrieNode:
   def __init__(self):
@@ -26,16 +27,20 @@ class TrieNode:
 
 
 class Trie:
-  """
-  A Trie structure stores words as a prefix-tree.
+  """A Trie structure stores words as a prefix-tree.
   It allows for fast string matching and is more compact than a full-on hash
   """
 
   def __init__(self):
     self.root = TrieNode()
 
-  def insert(self, word):
-    """Insert a word into the trie."""
+  def insert(self, word: str) -> None:
+    """Insert a word into the trie.
+
+    Args:
+      word: The word to insert.
+
+    """
     node = self.root
     for char in word:
       # if no branch for the letter exists, create one
@@ -45,11 +50,17 @@ class Trie:
       node = node.children[char]
     node.is_end_of_word = True
 
-  def search_in_text(self, text):
-    """
-    Given a Trie 'trie' holding a set of words and a long text document 'text',
+  def search_in_text(self, text: str) -> List[Tuple[int, str]]:
+    """Given a Trie 'trie' holding a set of words and a long text document 'text',
     find all occurrences in the text that match any word in the Trie.
     The function returns a list of tuples: (start_index, matched_word).
+
+    Args:
+      text: the input text
+
+    Returns:
+      A list of tuples listing the index and content of each match
+
     """
     matches = []
     n = len(text)
@@ -68,12 +79,15 @@ class Trie:
         j += 1
     return matches
 
-  def serialize(self):
-    """
-    Serializes the entire trie structure into a string using bracket and comma delimiters.
+  def serialize(self) -> str:
+    """Serializes the entire trie structure into a string using bracket and comma delimiters.
     Format for a node is:
         [is_end, letter1, serialized(child1), letter2, serialized(child2), ...]
     is_end is 1 if the node marks the end of a word, 0 otherwise.
+
+    Returns:
+      The serialized trie as a string
+
     """
 
     def serialize_node(node):
@@ -88,10 +102,18 @@ class Trie:
     return serialize_node(self.root)
 
   @staticmethod
-  def deserialize(s):
-    """
-    Deserializes the string 's' to reconstruct a Trie.
+  def deserialize(
+    s: str,
+  ) -> "Trie":
+    """Deserializes the string 's' to reconstruct a Trie.
     Returns a new Trie object.
+
+    Args:
+      s: input string with serialized trie
+
+    Returns:
+      The deserialized Trie
+
     """
     # Use a recursive parser that reads one node at a time.
     # The string format is assumed to be valid and in the format provided by serialize.

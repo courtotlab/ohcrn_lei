@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -19,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import json
 import re
 import sys
+from typing import Any, List
 
 """
 compare_json.py compares JSON files containing the extraction
@@ -48,15 +48,21 @@ with open(testJSON, "r") as stream:
   testData = json.load(stream)
 
 
-def forceList(x):
-  """
-  Forces any given input to data type list.
+def forceList(x: Any) -> List[Any]:
+  """Forces any given input to data type list.
+
+  Args:
+    any input
+
+  Returns:
+    A listified version of the input
+
   """
   if type(x) is not list:
     if type(x) is dict:
       return [v for v in x.values() if v is not None and v != ""]
     elif type(x) is set:
-      return list(set)
+      return list(x)
     elif x is None or x == "":
       return []
     else:
@@ -65,13 +71,19 @@ def forceList(x):
     return x
 
 
-def normalizeNames(xs):
-  """
-  Normalizes strings and identifiers to a common format to make
+def normalizeNames(xs: List[str]) -> List[str]:
+  """Normalizes strings and identifiers to a common format to make
   them more comparable by removing prefixes and brackets and
   converting them to all upper-case.
+
+  Args:
+    A list of strings to be normalized
+
+  Returns:
+    The list of normalized strings
+
   """
-  out = []
+  out: List[str] = []
   for x in xs:
     # normalize hgvs by removing prefixes and brackets
     x = re.sub(r"Chr.+:g\.", "", x)
@@ -101,10 +113,17 @@ def normalizeNames(xs):
   return out
 
 
-def greedyPairOff(xs, ys):
-  """
-  Calculates the number of matches between two lists and outputs it
+def greedyPairOff(xs: List, ys: List) -> dict[str, Any]:
+  """Calculates the number of matches between two lists and outputs it
   together with the unmatched items of each input list.
+
+  Args:
+    xs: A list of items
+    ys: Another list of items
+
+  Returns:
+    A dictionary listing the number of hits, as well as lists of unpaired items from x and y.
+
   """
   taken_is = set()
   taken_js = set()
@@ -122,7 +141,14 @@ def greedyPairOff(xs, ys):
   return {"hits": len(taken_is), "unused_xs": unused_xs, "unused_ys": unused_ys}
 
 
-def printTable(data: dict) -> None:
+def printTable(data: dict[str, dict[str, Any]]) -> None:
+  """Pretty-prints a dict as a table.
+
+  Args:
+    data: the input dictionary to be printed
+
+  """
+
   def list2str(x):
     if type(x) is list:
       return "|".join(x)
@@ -136,7 +162,7 @@ def printTable(data: dict) -> None:
     print(rowname + "\t" + "\t".join(valStr))
 
 
-output = {}
+output: dict[str, dict] = {}
 for pageKey in refData:
   if pageKey not in testData:
     die("Missing page key!")

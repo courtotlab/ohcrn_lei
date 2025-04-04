@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -146,8 +145,7 @@ def test_load_task_internal_file_success(monkeypatch, tmp_path):
 
 
 def test_load_task_unknown_task(monkeypatch, tmp_path):
-  """
-  Test that if no task is found (external or internal), the function prints an error,
+  """Test that if no task is found (external or internal), the function prints an error,
   calls print_usage, and exits with os.EX_USAGE.
   """
   dummy_usage = DummyUsage()
@@ -159,9 +157,7 @@ def test_load_task_unknown_task(monkeypatch, tmp_path):
 
 
 def test_load_task_invalid_plugin_definition(temp_task_file):
-  """
-  Test that a plugin line without an '=' operator triggers sys.exit with os.EX_USAGE.
-  """
+  """Test that a plugin line without an '=' operator triggers sys.exit with os.EX_USAGE."""
   file_contents = (
     "##### START PROMPT #####\n"
     "Some prompt\n"
@@ -180,8 +176,7 @@ def test_load_task_invalid_plugin_definition(temp_task_file):
 
 
 def test_load_task_invalid_format(temp_task_file):
-  """
-  Test a file that does not split into sections correctly,
+  """Test a file that does not split into sections correctly,
   which should cause a ValueError in split_sections and then sys.exit with os.EX_NOTFOUND.
   """
   file_contents = "This file does not use section delimiters properly."

@@ -11,14 +11,14 @@
 
 ## Status
 [![Python application](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml/badge.svg)](https://github.com/courtotlab/ohcrn_lei/actions/workflows/python-app.yml) 
-![GitHub Release](https://img.shields.io/github/v/release/courtotlab/ohcrn_lei)
+![GitHub Release](https://img.shields.io/github/v/release/courtotlab/ohcrn_lei?include_prereleases)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 ## Overview
 
-The `ohcrn-lei` tool takes a `PDF` or `TXT` file of a clinical report and extracts desired information from it, which will be output in `json` format. 
+The `ohcrn-lei` processes `PDF` or `TXT` files of clinical reports and extracts desired information from it, which will be output in `json` format. 
 
-It currently supports the following built-in extraction tasks:
+LEI currently supports the following built-in extraction tasks:
   * **Report**: Extracts the following data:
     1. "report_date" (Collected On, Received On, etc in "YYYY-MM-DD" format).
     2. "report_type": Type of report.
@@ -69,15 +69,11 @@ $ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ### Installation ###
 **Preliminarily:**
-
-  1. Download the wheel (`.whl`) file from the [latest release](https://github.com/courtotlab/ohcrn_lei/releases)
-  2. Install the wheel file via `uv`.
-
+Install directly from github via `uv`:
 ```bash
-# substitute the link below with the latest release
-$ wget 'https://github.com/courtotlab/ohcrn_lei/releases/download/v0.2.0/ohcrn_lei-0.1.0-py3-none-any.whl'
-$ uv tool install ohcrn_lei-0.1.0-py3-none-any.whl
+$ uv tool install "ohcrn-lei @ git+https://github.com/courtotlab/ohcrn_lei"
 ```
+<!-- 
 **🚧🚧 After deployment on pypi becomes available: 🚧🚧**
 
 With `uv` (fastest and easiest, if available):
@@ -89,7 +85,7 @@ With `pip` (slower):
 ```bash
 # This will require python 3.13 or higher to be installed!
 pipx install --user ohcrn_lei
-```
+``` -->
 
 ### Usage
 After installation, you can run the `ohcrn-lei` in your command line. For example, to run the `report` extraction task on the file `example.pdf`, run:
@@ -153,7 +149,7 @@ The following plugins are supported:
   * **regex_chromosome** : Extracts chromosome identifiers using a regular expression search.
 
 ## Contributing
-### How to build the project
+### Build process
 To build the project from source, use [`uv`](https://docs.astral.sh/uv/#installation)
 ```bash
 $ git clone https://github.com/courtotlab/ohcrn_lei.git
@@ -161,6 +157,31 @@ $ cd ohcrn_lei
 $ uv build
 ```
 The resulting `.whl` file will be n the `dist/` directory.
+
+### Code quality
+Unit tests are located in the `tests/` directory. To run them use 
+```bash
+$ uv run pytest
+```
+
+You can lint and format the code with `ruff`:
+```bash
+$ uv run ruff check
+$ uv run ruff format
+```
+
+### Pull requests
+If you are an outside contributor, you'll want to [fork the repo]((https://github.com/courtotlab/ohcrn_lei/fork)) first. Members of the Courtot Lab can create a branch on this repo instead.
+
+1. Create your feature branch (`git checkout -b feature/fooBar`)
+2. Commit your changes (`git commit -am 'Add some fooBar'`)
+3. Push to the branch (`git push origin feature/fooBar`)
+4. Test 
+4. Open a [pull request](https://github.com/courtotlab/ohcrn_lei/compare).
+
+## Authors
+ * [Andres Melani de la Hoz](https://github.com/afmelani3365)
+ * [Jochen Weile](https://github.com/jweile)
 
 ## Citation
 Coming soon.

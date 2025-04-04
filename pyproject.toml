@@ -13,7 +13,6 @@ requires-python = ">=3.13"
 dependencies = [
     "argparse>=1.4.0",
     "easyocr==1.7.1",
-    "mavehgvs==0.6.1",
     "openai==1.55.3",
     "pdf2image>=1.17.0",
     "python-dotenv==0.21.0",
@@ -29,12 +28,24 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "mypy>=1.15.0",
     "pytest>=8.3.5",
+    "pytest-cov>=6.1.0",
     "ruff>=0.11.2",
+    "types-requests>=2.32.0.20250328",
 ]
 
 [tool.ruff]
 indent-width = 2
 
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "DOC"]
+preview = true
+ignore = []
+
 [tool.pytest.ini_options]
-pythonpath = ["ohcrn_lei"]
+pythonpath = ["src"]
+addopts = "--cov --cov-report term-missing --no-cov-on-fail"
+
+[tool.coverage.run]
+source = ["src"]

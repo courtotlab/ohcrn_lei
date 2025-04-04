@@ -25,3 +25,7 @@ eval/reference/
 eval/metrics/
 eval/vis/
 eval/old_result/
+
+# pytest
+htmlcov
+.coverage

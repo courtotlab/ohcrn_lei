@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -25,6 +24,7 @@ from ohcrn_lei.cli import die, process_cli_args
 
 
 def start() -> None:
+  """Main entry point for ohcrn-lei."""
   # print license header
   print(
     """

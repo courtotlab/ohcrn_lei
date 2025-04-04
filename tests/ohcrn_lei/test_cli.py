@@ -15,8 +15,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from ohcrn_lei.main import start
+import pytest
+
+from ohcrn_lei.cli import process_cli_args
 
 
-def main() -> None:
-  start()
+def test_process_cli_args_noArgs():
+  with pytest.raises(SystemExit):
+    process_cli_args()
+
+
+def test_process_cli_args(monkeypatch):
+  fake_args = ["ohcrn-lei", "-t", "test", "-o", "testout.json", "testfile.txt"]
+  monkeypatch.setattr("argparse._sys.argv", fake_args)
+  _, args = process_cli_args()
+  assert args.task == "test"
+  assert args.filename == "testfile.txt"
+  assert args.page_batch == 2
+  assert args.outfile == "testout.json"

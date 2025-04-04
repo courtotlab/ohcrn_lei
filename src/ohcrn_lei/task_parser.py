@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -19,18 +18,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import importlib.resources
 import os
 import re
+from typing import Callable, List
 
 from ohcrn_lei.cli import die
 from ohcrn_lei.task import Task
 
 
-def load_task(taskname, print_usage) -> Task:
-  """
-  Load a task by name. The name can either be
+# HACK: Handle usage printing in cli.py somehow instead.
+def load_task(taskname: str, print_usage: Callable[[], None]) -> Task:
+  """Load a task by name. The name can either be
   an internal task (stored in package data), or an
-  external file
-  """
+  external file.
 
+  Args:
+    taskname: the name of the task to load (internal name or file path)
+    print_usage: A function that can be called to print usage information
+
+  Returns:
+    A task object
+
+  """
   taskData = ""
   # check if task refers to an external task file and if so, load it
   if re.search(r"\.txt$", taskname):
@@ -81,14 +88,29 @@ def load_task(taskname, print_usage) -> Task:
   return task
 
 
-def split_sections(contents):
+def split_sections(contents: str) -> dict[str, str]:
+  """Splits text according to content sections, which are delimited by lines like:
+  ##### START FOOBAR #####
+  text here
+  ##### END FOOBAR #####
+
+  Args:
+    contents: The input text string
+
+  Returns:
+    A dictionary linking section names to section content
+
+  Raises:
+    ValueError: if the content does not conform to the above format.
+
+  """
   # Regex pattern to match section delimiters.
   # It matches either START or END followed by a section name.
   pattern = re.compile(r"#####\s*(START|END)\s+([A-Z0-9_]+)\s*#####", re.I)
 
   sections = {}
   current_section = None
-  content_lines = []
+  content_lines: List[str] = []
 
   for line in contents.splitlines():
     # Check if the line matches our section delimiter pattern.

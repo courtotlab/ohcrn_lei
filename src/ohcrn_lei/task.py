@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -33,25 +32,33 @@ from ohcrn_lei.regex_utils import (
 
 
 class Task:
-  """
-  Task performs an extraction task. It gets configured with an
+  """Task performs an extraction task. It gets configured with an
   LLM prompt and option al plugins.
 
   run() executes the task on a given input file.
   """
 
+  prompt: str
+  plugins: dict | None
+
   def __init__(self, prompt: str):
-    """
-    Constructor to create a new task with an LLM prompt.
+    """Constructor to create a new task with an LLM prompt.
+
+    Args:
+      prompt: LLM prmopt
+
     """
     self.prompt = prompt
     self.plugins = None
 
   def set_plugins(self, plugins: dict):
-    """
-    Sets the plugins for this task. Plugins are formatted
+    """Sets the plugins for this task. Plugins are formatted
     as dicts with have the desired json key as keys and
     the desired operations as values.
+
+    Args:
+      plugins: a dictionary of plugins to add to the task
+
     """
     self.plugins = plugins
 
@@ -60,10 +67,22 @@ class Task:
     return "PROMPT:\n" + self.prompt + "\nPLUGINS:\n" + str(self.plugins)
 
   def run(self, inputfile: str, chunk_size=2, no_ocr=False, llm_mock=False) -> dict:
-    """
-    Run the task on the given input file. If the file has multiple
+    """Run the task on the given input file. If the file has multiple
     pages use the chunk size to determine how many pages are processed
     in a single batch.
+
+    Args:
+      inputfile: Path to the input pdf or text file
+      chunk_size: how many pages to process per batch
+      no_ocr: disable OCR
+      llm_mock: disable LLM call (for testing / debugging)
+
+    Returns:
+      A dictionary of the JSON output produced by LLM and plugins
+
+    Raises:
+      ValueError: If an invalid plugin was defined
+
     """
     if no_ocr:
       all_text = self.convert_txt_to_str_list(inputfile)
@@ -110,6 +129,7 @@ class Task:
             case "regex_chromosome":
               pl_output = get_chromosomes(pages_text)
             case _:
+              # FIXME: This should probably be checked when the plugins are added, not when they're run.
               raise ValueError(f"Unrecognized plugin name: {plugin_name}")
           # full_results[page_key].update({path: pl_output})
           if path in full_results[page_key]:
@@ -124,9 +144,16 @@ class Task:
     return full_results
 
   def integrateResults(self, xs, ys):
-    """
-    Intersects two lists (instead of sets)
+    """Intersects two lists (instead of sets)
     while preserving duplicates
+
+    Args:
+      xs: Any list
+      ys: Any other list
+
+    Returns:
+      A list that is the (non-deduplicated) intersection of the inputs.
+
     """
     if type(xs) is not list:
       xs = [xs]
@@ -144,9 +171,15 @@ class Task:
     return xs + unused_ys
 
   def convert_txt_to_str_list(self, inputfile: str) -> List[str]:
-    """
-    Reads a text file and wraps it in a list.
+    """Reads a text file and wraps it in a list.
     This simulates multi-page readout from a PDF
+
+    Args:
+      inputfile: Path to text file
+
+    Returns:
+      A mock list of pages (but really just the full text in a singleton list)
+
     """
     try:
       with open(inputfile, "r", encoding="utf-8") as instream:
