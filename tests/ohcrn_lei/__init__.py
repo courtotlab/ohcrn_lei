@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify

@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -28,8 +27,7 @@ class TrieNode:
 
 
 class Trie:
-  """
-  A Trie structure stores words as a prefix-tree.
+  """A Trie structure stores words as a prefix-tree.
   It allows for fast string matching and is more compact than a full-on hash
   """
 
@@ -37,11 +35,11 @@ class Trie:
     self.root = TrieNode()
 
   def insert(self, word: str) -> None:
-    """
-    Insert a word into the trie.
+    """Insert a word into the trie.
 
     Args:
       word: The word to insert.
+
     """
     node = self.root
     for char in word:
@@ -53,8 +51,7 @@ class Trie:
     node.is_end_of_word = True
 
   def search_in_text(self, text: str) -> List[Tuple[int, str]]:
-    """
-    Given a Trie 'trie' holding a set of words and a long text document 'text',
+    """Given a Trie 'trie' holding a set of words and a long text document 'text',
     find all occurrences in the text that match any word in the Trie.
     The function returns a list of tuples: (start_index, matched_word).
 
@@ -63,6 +60,7 @@ class Trie:
 
     Returns:
       A list of tuples listing the index and content of each match
+
     """
     matches = []
     n = len(text)
@@ -82,14 +80,14 @@ class Trie:
     return matches
 
   def serialize(self) -> str:
-    """
-    Serializes the entire trie structure into a string using bracket and comma delimiters.
+    """Serializes the entire trie structure into a string using bracket and comma delimiters.
     Format for a node is:
         [is_end, letter1, serialized(child1), letter2, serialized(child2), ...]
     is_end is 1 if the node marks the end of a word, 0 otherwise.
 
     Returns:
       The serialized trie as a string
+
     """
 
     def serialize_node(node):
@@ -107,8 +105,7 @@ class Trie:
   def deserialize(
     s: str,
   ) -> "Trie":
-    """
-    Deserializes the string 's' to reconstruct a Trie.
+    """Deserializes the string 's' to reconstruct a Trie.
     Returns a new Trie object.
 
     Args:
@@ -116,6 +113,7 @@ class Trie:
 
     Returns:
       The deserialized Trie
+
     """
     # Use a recursive parser that reads one node at a time.
     # The string format is assumed to be valid and in the format provided by serialize.

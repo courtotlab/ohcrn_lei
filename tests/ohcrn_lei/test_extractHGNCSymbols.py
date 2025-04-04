@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -39,8 +38,9 @@ TEST_TEXT = "We found variants in MTHFR, CHEK2 and UBE2I. NoMatch"
 FAKE_TSV = (
   "hgnc_id\tsymbol\tcol3\tcol4\tcol5\tcol6\tcol7\tcol8\taliases\tcol10\tlegacy\n"
   'HGNC:1\tMTHFR\t-\t-\t-\t-\t-\t-\t\t-\t"NoMatch"\n'
-  "HGNC:2\tCHEK2\t-\t-\t-\t-\t-\t-\t\t-\t\n"
-  'HGNC:2\tUBC6\t-\t-\t-\t-\t-\t-\t"UBE2I|NoMatch"\t-\t\n'
+  'HGNC:2\tCHEK2\t-\t-\t-\t-\t-\t-\t\t-\t"CHK2"\n'
+  'HGNC:3\tUBC6\t-\t-\t-\t-\t-\t-\t"UBE2I|NoMatch"\t-\t\n'
+  "HGNC:4\tBrokenLine"
 )
 
 
@@ -209,6 +209,53 @@ def test_load_or_build_Trie_build_from_URL(monkeypatch, tmp_path):
   assert "NoMatch" not in found
   for gene in GENES:
     assert gene in found
+
+
+def test_load_or_build_Trie_broken_internal_localIO(monkeypatch, tmp_path):
+  # Test the case where internal resource is broken
+  # and the local cache is unreadable.
+
+  # First, force importlib.resources.files point to a
+  # mock file containing a broken Trie serialization.
+  broken_serialization = "[2"
+  fake_internal_dir = tmp_path / "data"
+  fake_internal_dir.mkdir()
+  fake_internal_file = fake_internal_dir / "hgncTrie.txt"
+  fake_internal_file.write_text(broken_serialization, encoding="utf-8")
+  monkeypatch.setattr(
+    "ohcrn_lei.extractHGNCSymbols.importlib.resources.files", lambda pkg: tmp_path
+  )
+  # Create a temporary file with a valid serialized Trie.
+  trie = Trie()
+  for gene in GENES:
+    trie.insert(gene)
+  serialized = trie.serialize()
+  trie_file = tmp_path / "hgncTrie.txt"
+  trie_file.write_text(serialized, encoding="utf-8")
+  # cause an IO error by making the file unreadable
+  trie_file.chmod(0o200)
+
+  # test the actual method
+  with pytest.raises(SystemExit):
+    trie = load_or_build_Trie(str(trie_file), FAKE_URL)
+
+
+def test_load_or_build_Trie_broken_local(monkeypatch, tmp_path):
+  # Test the case where local cache file is broken.
+
+  # First, force importlib.resources.files error out
+  monkeypatch.setattr(
+    "ohcrn_lei.extractHGNCSymbols.importlib.resources.files",
+    lambda pkg: (_ for _ in ()).throw(Exception("test")),
+  )
+  # Create a temporary file with a broken serialized Trie.
+  broken_serialization = "[2"
+  trie_file = tmp_path / "hgncTrie.txt"
+  trie_file.write_text(broken_serialization, encoding="utf-8")
+
+  # test the actual method
+  with pytest.raises(SystemExit):
+    load_or_build_Trie(str(trie_file), FAKE_URL)
 
 
 def test_find_HGNC_symbols(monkeypatch, tmp_path):

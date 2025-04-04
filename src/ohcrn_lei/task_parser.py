@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -27,8 +26,7 @@ from ohcrn_lei.task import Task
 
 # HACK: Handle usage printing in cli.py somehow instead.
 def load_task(taskname: str, print_usage: Callable[[], None]) -> Task:
-  """
-  Load a task by name. The name can either be
+  """Load a task by name. The name can either be
   an internal task (stored in package data), or an
   external file.
 
@@ -38,8 +36,8 @@ def load_task(taskname: str, print_usage: Callable[[], None]) -> Task:
 
   Returns:
     A task object
-  """
 
+  """
   taskData = ""
   # check if task refers to an external task file and if so, load it
   if re.search(r"\.txt$", taskname):
@@ -91,8 +89,7 @@ def load_task(taskname: str, print_usage: Callable[[], None]) -> Task:
 
 
 def split_sections(contents: str) -> dict[str, str]:
-  """
-  Splits text according to content sections, which are delimited by lines like:
+  """Splits text according to content sections, which are delimited by lines like:
   ##### START FOOBAR #####
   text here
   ##### END FOOBAR #####
@@ -105,8 +102,8 @@ def split_sections(contents: str) -> dict[str, str]:
 
   Raises:
     ValueError: if the content does not conform to the above format.
-  """
 
+  """
   # Regex pattern to match section delimiters.
   # It matches either START or END followed by a section name.
   pattern = re.compile(r"#####\s*(START|END)\s+([A-Z0-9_]+)\s*#####", re.I)

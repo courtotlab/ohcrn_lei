@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -27,8 +26,7 @@ from ohcrn_lei.cli import die
 
 
 def convert_pdf_to_str_list(pdf_path: str, language_list=["en"], dpi=300) -> List[str]:
-  """
-  Use EasyOCR to convert the given PDF file into plain text but page by page.
+  """Use EasyOCR to convert the given PDF file into plain text but page by page.
   Returns a list of strings representing each page.
 
   Args:
@@ -38,6 +36,7 @@ def convert_pdf_to_str_list(pdf_path: str, language_list=["en"], dpi=300) -> Lis
 
   Returns:
     A list of text strings representing the document pages
+
   """
   # Initialize the EasyOCR reader.
   reader = easyocr.Reader(language_list)
@@ -68,8 +67,7 @@ def convert_pdf_to_str_list(pdf_path: str, language_list=["en"], dpi=300) -> Lis
 
 
 def convert_pdf_to_text(pdf_path: str, language_list=["en"], dpi=300) -> str:
-  """
-  Use EasyOCR to convert the given PDF file into plain text.
+  """Use EasyOCR to convert the given PDF file into plain text.
   Returns a string, with pages separated by two newline characters.
 
   Args:
@@ -79,6 +77,7 @@ def convert_pdf_to_text(pdf_path: str, language_list=["en"], dpi=300) -> str:
 
   Returns:
     A text string of the OCR result.
+
   """
   pages = convert_pdf_to_str_list(pdf_path, language_list, dpi)
   return "\n\n".join(pages)

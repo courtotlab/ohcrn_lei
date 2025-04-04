@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -50,14 +49,14 @@ with open(testJSON, "r") as stream:
 
 
 def forceList(x: Any) -> List[Any]:
-  """
-  Forces any given input to data type list.
+  """Forces any given input to data type list.
 
   Args:
     any input
 
   Returns:
     A listified version of the input
+
   """
   if type(x) is not list:
     if type(x) is dict:
@@ -73,8 +72,7 @@ def forceList(x: Any) -> List[Any]:
 
 
 def normalizeNames(xs: List[str]) -> List[str]:
-  """
-  Normalizes strings and identifiers to a common format to make
+  """Normalizes strings and identifiers to a common format to make
   them more comparable by removing prefixes and brackets and
   converting them to all upper-case.
 
@@ -83,6 +81,7 @@ def normalizeNames(xs: List[str]) -> List[str]:
 
   Returns:
     The list of normalized strings
+
   """
   out: List[str] = []
   for x in xs:
@@ -115,8 +114,7 @@ def normalizeNames(xs: List[str]) -> List[str]:
 
 
 def greedyPairOff(xs: List, ys: List) -> dict[str, Any]:
-  """
-  Calculates the number of matches between two lists and outputs it
+  """Calculates the number of matches between two lists and outputs it
   together with the unmatched items of each input list.
 
   Args:
@@ -125,6 +123,7 @@ def greedyPairOff(xs: List, ys: List) -> dict[str, Any]:
 
   Returns:
     A dictionary listing the number of hits, as well as lists of unpaired items from x and y.
+
   """
   taken_is = set()
   taken_js = set()
@@ -143,11 +142,11 @@ def greedyPairOff(xs: List, ys: List) -> dict[str, Any]:
 
 
 def printTable(data: dict[str, dict[str, Any]]) -> None:
-  """
-  Pretty-prints a dict as a table.
+  """Pretty-prints a dict as a table.
 
   Args:
     data: the input dictionary to be printed
+
   """
 
   def list2str(x):

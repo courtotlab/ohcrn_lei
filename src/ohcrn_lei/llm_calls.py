@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -24,8 +23,7 @@ from openai import OpenAI
 def call_gpt_api(
   system_msg: str, query: str, model_used="gpt-4o", mock: bool = False
 ) -> dict:
-  """
-  Calls the GPT4o API with a given system message and query string.
+  """Calls the GPT4o API with a given system message and query string.
 
   Args:
     system_msg: The system-message part of the LLM prompt
@@ -35,8 +33,8 @@ def call_gpt_api(
 
   Returns:
     A dictionary representation of the JSON output produced by the LLM
-  """
 
+  """
   if mock:
     return {"output": "mock"}
 

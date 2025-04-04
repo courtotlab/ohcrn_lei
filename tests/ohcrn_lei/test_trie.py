@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -82,7 +81,6 @@ def test_serialization_and_deserialization():
   trie = create_sample_trie(words)
 
   serialized = trie.serialize()
-  print(serialized)
   new_trie = Trie.deserialize(serialized)
 
   # Test that search_in_text returns the same matches in a given text.
