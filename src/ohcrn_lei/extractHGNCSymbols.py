@@ -1,5 +1,4 @@
-"""
-OHCRN-LEI - LLM-based Extraction of Information
+"""OHCRN-LEI - LLM-based Extraction of Information
 Copyright (C) 2025 Ontario Institute for Cancer Research
 
 This program is free software: you can redistribute it and/or modify
@@ -28,8 +27,7 @@ from ohcrn_lei.trieSearch import Trie
 
 
 def filterAliases(symbols: List[str]) -> List[str]:
-  """
-  Only allow aliases that have at least one uppercase character followed by a number
+  """Only allow aliases that have at least one uppercase character followed by a number
   and a length of at least 3
 
   Args:
@@ -37,13 +35,13 @@ def filterAliases(symbols: List[str]) -> List[str]:
 
   Returns:
     A filtered list of gene symbols that match the criteria.
+
   """
   return [s for s in symbols if len(s) > 2 and re.search(r"[A-Z][0-9]", s)]
 
 
 def parse_HGNC_from_URL(hgnc_url: str) -> Trie:
-  """
-  Read HGNC definitions file, pull all gene symbols from it
+  """Read HGNC definitions file, pull all gene symbols from it
   and feed them into a search Trie.
 
   Args:
@@ -51,6 +49,7 @@ def parse_HGNC_from_URL(hgnc_url: str) -> Trie:
 
   Returns:
     A trie loaded with all valid gene symbols.
+
   """
   # Create an empty trie
   trie = Trie()
@@ -85,8 +84,7 @@ def parse_HGNC_from_URL(hgnc_url: str) -> Trie:
 
 
 def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
-  """
-  Trie to load a serialized search Trie for HGNC gene symbols from a given cache file.
+  """Trie to load a serialized search Trie for HGNC gene symbols from a given cache file.
   If it doesn't exist, build a new Trie from the HGNC source on the internet,
   serialize it and store it in the cache file.
 
@@ -96,6 +94,7 @@ def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
 
   Returns:
     A trie of all HGNC gene symbols
+
   """
   trie = None
   serialized = None
@@ -114,36 +113,35 @@ def load_or_build_Trie(trieFile: str, hgnc_url: str) -> Trie:
 
   # if that failed, try to load from local file
   if not trie and os.path.exists(trieFile):
+    print("Attempting to load HGNC Trie from local cache")
     try:
       with open(trieFile, "r", encoding="utf-8") as infile:
         serialized = infile.read()
         trie = Trie.deserialize(serialized)
-        print("Gene symbol Trie read from file.")
-    except Exception as e:
-      # FIXME: We don't need to kill the program here, since we still have a fallback
-      die(f"Error while reading file {e}", os.EX_IOERR)
-    except ValueError as e:
-      die(f"HGNC-Trie file has invalid format: {e}", os.EX_DATAERR)
+    except OSError as e:  # OSError is the superclass of FileNotFoundError and IOError
+      print(f"Error while reading file {e}")
+    except ValueError:
+      print("HGNC-Trie file has invalid format!")
 
   # as a last resort, connect to HGNC online and parse their
   # gene symbol file from scratch, then save a local cache
   if not trie:
+    print("Attempting to reconstruct Trie from online HGNC file.")
     trie = parse_HGNC_from_URL(hgnc_url)
-    print("Parsed gene symbols from HGNC into Trie.")
     serialized = trie.serialize()
     try:
       with open(trieFile, "w", encoding="utf-8") as file:
         file.write(serialized)
-      print("Serialized gene symbol Trie saved.")
+      print(f"Serialized gene symbol Trie cached at {trieFile}")
     except Exception as e:
       die(f"Error while writing file: {e}", os.EX_IOERR)
 
+  print("Successfully loaded HGNC trie.")
   return trie
 
 
 def eliminate_submatches(matches: List[Tuple[int, str]]) -> List[Tuple[int, str]]:
-  """
-  Find all the submatches in the list of matches and remove them.
+  """Find all the submatches in the list of matches and remove them.
   E.g. "The gene is CHEK2." matches both "CHEK2" and "HE", but "HE" is
   a submatch of CHEK2 and would thus be discarded.
 
@@ -152,6 +150,7 @@ def eliminate_submatches(matches: List[Tuple[int, str]]) -> List[Tuple[int, str]
 
   Returns:
     A filtered list of match tuples, as above.
+
   """
   submatches = set()
   for i in range(len(matches)):
@@ -170,14 +169,14 @@ def eliminate_submatches(matches: List[Tuple[int, str]]) -> List[Tuple[int, str]
 
 
 def find_HGNC_symbols(text: str) -> List[str]:
-  """
-  Finds all HGNC gene symbols in a given piece of text.
+  """Finds all HGNC gene symbols in a given piece of text.
 
   Args:
     A text string to be searched for gene symbols
 
   Returns:
     The list of all gene symbols found in the text.
+
   """
   # Load Trie of HGNC symbols
   hgnc_url = "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/non_alt_loci_set.txt"
