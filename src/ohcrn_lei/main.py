@@ -64,7 +64,7 @@ under certain conditions.
   dotenv_file = get_dotenv_file()
   dotenv.load_dotenv(dotenv_file)
   if "OPENAI_API_KEY" not in os.environ:
-    print("⚠️ No API key found for OpenAI account!")
+    print("\n⚠️ No API key found for OpenAI account!")
     prompt_for_api_key()
     # reload environment after key was saved
     dotenv.load_dotenv(dotenv_file)

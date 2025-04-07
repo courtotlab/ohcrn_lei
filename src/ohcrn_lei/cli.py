@@ -32,7 +32,7 @@ def die(msg: str, code=1) -> None:
     code: exit code
 
   """
-  print("❌ ERROR: " + msg, file=sys.stderr)
+  print("\n❌ ERROR: " + msg, file=sys.stderr)
   sys.exit(code)
 
 

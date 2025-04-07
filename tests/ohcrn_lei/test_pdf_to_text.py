@@ -32,7 +32,8 @@ def fake_calls(monkeypatch):
   def fake_convert_from_path(pdf_path, dpi):
     return [[1, 2, 3, 4], [5, 6, 7, 8]]
 
-  monkeypatch.setattr("ohcrn_lei.pdf_to_text.convert_from_path", fake_convert_from_path)
+  # monkeypatch.setattr("ohcrn_lei.pdf_to_text.convert_from_path", fake_convert_from_path)
+  monkeypatch.setattr("pdf2image.convert_from_path", fake_convert_from_path)
 
   # Also patch out the call to EasyOCR
   class FakeReader:
@@ -42,7 +43,8 @@ def fake_calls(monkeypatch):
     def readtext(self, image_np, detail, paragraph):
       return [FAKE_TEXT]
 
-  monkeypatch.setattr("ohcrn_lei.pdf_to_text.easyocr.Reader", FakeReader)
+  # monkeypatch.setattr("ohcrn_lei.pdf_to_text.easyocr.Reader", FakeReader)
+  monkeypatch.setattr("easyocr.Reader", FakeReader)
 
 
 def test_conver_pdf_to_str_list(fake_calls, tmp_path):
@@ -68,7 +70,7 @@ def fake_calls_OCR_Exception(monkeypatch):
   def fake_convert_from_path(pdf_path, dpi):
     return [[1, 2, 3, 4], [5, 6, 7, 8]]
 
-  monkeypatch.setattr("ohcrn_lei.pdf_to_text.convert_from_path", fake_convert_from_path)
+  monkeypatch.setattr("pdf2image.convert_from_path", fake_convert_from_path)
 
   # Also patch out the call to EasyOCR
   class FakeReader:
@@ -78,7 +80,7 @@ def fake_calls_OCR_Exception(monkeypatch):
     def readtext(self, image_np, detail, paragraph):
       raise Exception("Fake exception")
 
-  monkeypatch.setattr("ohcrn_lei.pdf_to_text.easyocr.Reader", FakeReader)
+  monkeypatch.setattr("easyocr.Reader", FakeReader)
 
 
 def test_conver_pdf_to_text_OCR_Error(fake_calls_OCR_Exception, tmp_path):
@@ -98,7 +100,7 @@ def fake_calls_PDF_Exception(monkeypatch):
   def fake_convert_from_path(pdf_path, dpi):
     raise Exception("Fake exception")
 
-  monkeypatch.setattr("ohcrn_lei.pdf_to_text.convert_from_path", fake_convert_from_path)
+  monkeypatch.setattr("pdf2image.convert_from_path", fake_convert_from_path)
 
   # Also patch out the call to EasyOCR
   class FakeReader:
@@ -108,7 +110,7 @@ def fake_calls_PDF_Exception(monkeypatch):
     def readtext(self, image_np, detail, paragraph):
       return [FAKE_TEXT]
 
-  monkeypatch.setattr("ohcrn_lei.pdf_to_text.easyocr.Reader", FakeReader)
+  monkeypatch.setattr("easyocr.Reader", FakeReader)
 
 
 def test_conver_pdf_to_text_PDF_Error(fake_calls_PDF_Exception, tmp_path):

@@ -17,8 +17,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
 
-from openai import OpenAI
-
 
 def call_gpt_api(
   system_msg: str, query: str, model_used="gpt-4o", mock: bool = False
@@ -37,6 +35,9 @@ def call_gpt_api(
   """
   if mock:
     return {"output": "mock"}
+
+  # lazy import to speed-up app load time
+  from openai import OpenAI
 
   client = OpenAI()
 
