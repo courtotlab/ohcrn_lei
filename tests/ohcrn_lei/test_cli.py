@@ -15,9 +15,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import os
+from pathlib import Path
+
+import dotenv
 import pytest
 
-from ohcrn_lei.cli import process_cli_args
+from ohcrn_lei.cli import get_dotenv_file, process_cli_args, prompt_for_api_key
 
 
 def test_process_cli_args_noArgs():
@@ -33,3 +37,18 @@ def test_process_cli_args(monkeypatch):
   assert args.filename == "testfile.txt"
   assert args.page_batch == 2
   assert args.outfile == "testout.json"
+
+
+def test_get_dotenv_file():
+  file_path = Path(os.getenv("HOME")) / ".config" / "ohcrn-lei" / ".env"
+  assert get_dotenv_file() == file_path
+
+
+def test_prompt_for_api_key(monkeypatch, tmp_path):
+  dotenv_file = tmp_path / ".env"
+  fake_key = "sk-test"
+  monkeypatch.setattr("builtins.input", lambda text: fake_key)
+  monkeypatch.setattr("ohcrn_lei.cli.get_dotenv_file", lambda: dotenv_file)
+  prompt_for_api_key()
+  dotenv.load_dotenv(dotenv_file, override=True)
+  assert os.getenv("OPENAI_API_KEY") == fake_key

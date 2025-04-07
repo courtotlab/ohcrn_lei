@@ -45,17 +45,28 @@ In addition to the built-in extraction tasks, additional tasks can also be provi
 
 ## Getting started
 ### Prerequisites ###
+#### OpenAI account ####
+OHCRN-LEI uses GPT4o and thus requires an OpenAI account token. If you do not have an account, please create one on the [OpenAI webpage](https://openai.com). After verifying your account, log in, navigate to the API Keys section in your dashboard, and click on "Create new secret key" to generate your key. 
+
+Copy the key and store it in an environment variable named `OPENAI_API_KEY`. To do so, open your `.bashrc` (or `.zshenv` if you use zsh) and add the following entry:
+```bash
+export OPENAI_API_KEY=your-api-key-here
+```
+
+
+#### Poppler
 OHCRN-LEI requires `poppler` to be installed. If you don't have `poppler` installed already, you can do so as follows:
 
 **MacOS (via homewbrew):**
 ```bash
 $ brew install poppler
 ```
-**Debian/Ubuntu:**
+**Ubuntu/Debian:**
 ```bash
 $ sudo apt install poppler-utils
 ```
 
+#### UV
 We also recommend `uv` for a faster and easier installation process. (It only takes seconds!)
 
 **MacOS (via homewbrew):**

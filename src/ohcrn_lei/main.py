@@ -19,8 +19,10 @@ import json
 import os
 import sys
 
+import dotenv
+
 from ohcrn_lei import task_parser
-from ohcrn_lei.cli import die, process_cli_args
+from ohcrn_lei.cli import die, get_dotenv_file, process_cli_args, prompt_for_api_key
 
 
 def start() -> None:
@@ -57,6 +59,15 @@ under certain conditions.
   # check that file can be read
   if not os.access(args.filename, os.R_OK):
     die(f"File {args.filename} does not exist or cannot be read!", os.EX_IOERR)
+
+  # check that API key is available
+  dotenv_file = get_dotenv_file()
+  dotenv.load_dotenv(dotenv_file)
+  if "OPENAI_API_KEY" not in os.environ:
+    print("⚠️ No API key found for OpenAI account!")
+    prompt_for_api_key()
+    # reload environment after key was saved
+    dotenv.load_dotenv(dotenv_file)
 
   # Load the appropriate task. Pass print_usage as a lambda function for the task loader to use
   task = task_parser.load_task(args.task, lambda: cli_parser.print_usage())
