@@ -517,11 +517,12 @@ wheels = [
 
 [[package]]
 name = "ohcrn-lei"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "argparse" },
     { name = "easyocr" },
+    { name = "numpy" },
     { name = "openai" },
     { name = "pdf2image" },
     { name = "python-dotenv" },
@@ -541,6 +542,7 @@ dev = [
 requires-dist = [
     { name = "argparse", specifier = ">=1.4.0" },
     { name = "easyocr", specifier = "==1.7.1" },
+    { name = "numpy", specifier = ">=2.2.4" },
     { name = "openai", specifier = "==1.55.3" },
     { name = "pdf2image", specifier = ">=1.17.0" },
     { name = "python-dotenv", specifier = "==0.21.0" },
