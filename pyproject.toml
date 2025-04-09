@@ -1,6 +1,6 @@
 [project]
 name = "ohcrn-lei"
-version = "0.2.0"
+version = "0.3.0"
 description = "The ohcrn-lei tool takes a PDF or TXT file of a clinical report and extracts desired information from it, which will be output in json format."
 readme = "README.md"
 authors = [
@@ -13,6 +13,7 @@ requires-python = ">=3.13"
 dependencies = [
     "argparse>=1.4.0",
     "easyocr==1.7.1",
+    "numpy>=2.2.4",
     "openai==1.55.3",
     "pdf2image>=1.17.0",
     "python-dotenv==0.21.0",

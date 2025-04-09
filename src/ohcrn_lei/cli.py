@@ -15,8 +15,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import os
 import sys
 from argparse import ArgumentParser, Namespace
+from pathlib import Path
+
+import dotenv
 
 
 # helper function to exit with error message
@@ -28,8 +32,37 @@ def die(msg: str, code=1) -> None:
     code: exit code
 
   """
-  print("❌ ERROR: " + msg, file=sys.stderr)
+  print("\n❌ ERROR: " + msg, file=sys.stderr)
   sys.exit(code)
+
+
+def get_dotenv_file() -> Path:
+  """gets the path to the dotenv file
+
+  Returns:
+    The path to the dotenv file.
+  """
+  # ~/.config/ is the XDG standard for configuration file storage
+  home = os.getenv("HOME")
+  if home is None:
+    die("Unable to find home directory!", os.EX_CONFIG)
+  dotenv_dir = Path(str(home)) / ".config" / "ohcrn-lei"
+  # if the directory doesn't exist: Create it.
+  dotenv_dir.mkdir(parents=True, exist_ok=True)
+  dotenv_file = dotenv_dir / ".env"
+  return dotenv_file
+
+
+def prompt_for_api_key() -> None:
+  """Prompts the user for an OpenAI API key and saves it in dotenv."""
+  dotenv_file = get_dotenv_file()
+
+  key = input("Please enter your key: ").strip()
+  if not key.startswith("sk-"):
+    die("The provided strings is not a valide OpenAI API key!", os.EX_CONFIG)
+  else:
+    dotenv.set_key(dotenv_file, "OPENAI_API_KEY", key)
+    print(f"Key was saved to {dotenv_file}")
 
 
 def process_cli_args() -> tuple[ArgumentParser, Namespace]:

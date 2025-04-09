@@ -18,10 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 from typing import List
 
-import easyocr  # type: ignore
-import numpy as np
-from pdf2image import convert_from_path
-
 from ohcrn_lei.cli import die
 
 
@@ -39,20 +35,29 @@ def convert_pdf_to_str_list(pdf_path: str, language_list=["en"], dpi=300) -> Lis
 
   """
   # Initialize the EasyOCR reader.
-  reader = easyocr.Reader(language_list)
+  # lazy import to speed up app boot time
+  from easyocr import Reader  # type: ignore
+
+  reader = Reader(language_list)
 
   # Convert PDF pages to images.
   try:
+    # lazy import to speed up app boot time
+    from pdf2image import convert_from_path
+
     # You can adjust dpi if necessary.
     pages = convert_from_path(pdf_path, dpi=dpi)
   except Exception as e:
     die(f"Failed to converting PDF to images: {e}", os.EX_CONFIG)
 
+  # lazy import to speed up app boot time
+  from numpy import array
+
   full_text = []
   for i, page in enumerate(pages):
     print(f" - Processing page {i + 1}...")
     # Convert PIL image to numpy array.
-    image_np = np.array(page)
+    image_np = array(page)
 
     # Use EasyOCR to extract text from the image.
     try:
