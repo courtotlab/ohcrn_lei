@@ -1,6 +1,6 @@
 [project]
 name = "ohcrn-lei"
-version = "0.3.0"
+version = "0.3.1"
 description = "The ohcrn-lei tool takes a PDF or TXT file of a clinical report and extracts desired information from it, which will be output in json format."
 readme = "README.md"
 authors = [
