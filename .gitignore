@@ -15,9 +15,6 @@ wheels/
 #VSCode files
 .vscode
 
-#trie file
-hgncTrie.txt
-
 #eval data
 eval/input/
 eval/output/
