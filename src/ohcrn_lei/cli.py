@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 import sys
 from argparse import ArgumentParser, Namespace
+from importlib import metadata
 from pathlib import Path
 
 import dotenv
@@ -74,6 +75,9 @@ def process_cli_args() -> tuple[ArgumentParser, Namespace]:
   """
   parser = ArgumentParser(description="Extract data from report file.")
   parser.add_argument(
+    "--version", action="version", version=f"ohcrn-lei {metadata.version('ohcrn_lei')}"
+  )
+  parser.add_argument(
     "-b",
     "--page-batch",
     type=int,
@@ -86,9 +90,9 @@ def process_cli_args() -> tuple[ArgumentParser, Namespace]:
     type=str,
     default="report",
     help="Specify the extraction task. This can either be a "
-    "pre-defined task ('report','molecular_test','variant')"
-    "or a plain *.txt file with a task definition. See documentation"
-    "for the task definition file format specification."
+    "pre-defined task ('report','molecular_test','variant') "
+    "or a plain *.txt file with a task definition. See documentation "
+    "for the task definition file format specification. "
     "Default: report",
   )
   parser.add_argument(
