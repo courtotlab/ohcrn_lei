@@ -79,14 +79,6 @@ $ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ### Installation ###
-**Preliminarily:**
-Install directly from github via `uv`:
-```bash
-$ uv tool install "ohcrn-lei @ git+https://github.com/courtotlab/ohcrn_lei"
-```
-<!-- 
-**🚧🚧 After deployment on pypi becomes available: 🚧🚧**
-
 With `uv` (fastest and easiest, if available):
 ```bash
 uv tool install ohcrn_lei
@@ -96,7 +88,7 @@ With `pip` (slower):
 ```bash
 # This will require python 3.13 or higher to be installed!
 pipx install --user ohcrn_lei
-``` -->
+```
 
 ### Usage
 After installation, you can run the `ohcrn-lei` in your command line. For example, to run the `report` extraction task on the file `example.pdf`, run:

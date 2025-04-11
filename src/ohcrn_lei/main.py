@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import json
 import os
 import sys
+from importlib import metadata
 
 import dotenv
 
@@ -29,8 +30,8 @@ def start() -> None:
   """Main entry point for ohcrn-lei."""
   # print license header
   print(
-    """
-OHCRN-LEI  Copyright (C) 2025  Ontario Institute for Cancer Research
+    f"""
+OHCRN-LEI {metadata.version("ohcrn_lei")} Copyright (C) 2025  Ontario Institute for Cancer Research
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
 under certain conditions.
