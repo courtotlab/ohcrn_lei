@@ -26,6 +26,7 @@ from ohcrn_lei import task_parser
 from ohcrn_lei.cli import (
   die,
   get_dotenv_file,
+  is_poppler_installed,
   link,
   process_cli_args,
   prompt_for_api_key,
@@ -59,10 +60,12 @@ under certain conditions. {link("https://www.gnu.org/licenses/gpl-3.0.txt", "See
     args.no_ocr = True
 
   if args.no_ocr:
+    print(" * OCR disabled")
     # check that the file isn't a PDF file
     if args.filename.endswith(".pdf"):
       die("When using --no-ocr, the input file cannot be a PDF!", os.EX_USAGE)
-    print(" * OCR disabled")
+  elif not is_poppler_installed():
+    die("Poppler is not installed! Please install Poppler to process PDF files.")
 
   # check that file can be read
   if not os.access(args.filename, os.R_OK):

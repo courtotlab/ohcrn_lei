@@ -16,6 +16,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import os
+import shutil
 import sys
 from argparse import ArgumentParser, Namespace
 from importlib import metadata
@@ -131,3 +132,13 @@ def link(uri: str, label: (str | None) = None) -> str:
   escape_mask = "\033]8;{};{}\033\\{}\033]8;;\033\\"
 
   return escape_mask.format(parameters, uri, label)
+
+
+def is_poppler_installed() -> bool:
+  """Checks if poppler-utils is installed.
+
+  Returns:
+    Boolean indicating whether poppler-utils is installed.
+  """
+  binaries = ["pdftocairo", "pdftoppm"]
+  return any(shutil.which(bin) for bin in binaries)
