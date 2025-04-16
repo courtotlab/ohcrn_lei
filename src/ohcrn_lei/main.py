@@ -18,22 +18,31 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import json
 import os
 import sys
+from importlib import metadata
 
 import dotenv
 
 from ohcrn_lei import task_parser
-from ohcrn_lei.cli import die, get_dotenv_file, process_cli_args, prompt_for_api_key
+from ohcrn_lei.cli import (
+  die,
+  get_dotenv_file,
+  is_poppler_installed,
+  link,
+  process_cli_args,
+  prompt_for_api_key,
+)
 
 
 def start() -> None:
   """Main entry point for ohcrn-lei."""
   # print license header
   print(
-    """
-OHCRN-LEI  Copyright (C) 2025  Ontario Institute for Cancer Research
+    f"""
+🌺🌺🌺 OHCRN-LEI 🌺🌺🌺 v{metadata.version("ohcrn_lei")}
+Copyright © 2025  Ontario Institute for Cancer Research
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
-under certain conditions.
+under certain conditions. {link("https://www.gnu.org/licenses/gpl-3.0.txt", "See license for details")}.
 """
   )
 
@@ -51,10 +60,12 @@ under certain conditions.
     args.no_ocr = True
 
   if args.no_ocr:
+    print(" * OCR disabled")
     # check that the file isn't a PDF file
     if args.filename.endswith(".pdf"):
       die("When using --no-ocr, the input file cannot be a PDF!", os.EX_USAGE)
-    print(" * OCR disabled")
+  elif not is_poppler_installed():
+    die("Poppler is not installed! Please install Poppler to process PDF files.")
 
   # check that file can be read
   if not os.access(args.filename, os.R_OK):
