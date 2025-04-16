@@ -111,3 +111,23 @@ def process_cli_args() -> tuple[ArgumentParser, Namespace]:
   parser.add_argument("filename", type=str, help="Path to the report file to process.")
   args = parser.parse_args()
   return parser, args
+
+
+def link(uri: str, label: (str | None) = None) -> str:
+  """Creates an XTerm-compatible hyperlink
+
+  Args:
+    uri: the link target
+    label: The visible text for the link
+
+  Returns:
+    The terminal control code for the hyperlink
+  """
+  if label is None:
+    label = uri
+  parameters = ""
+
+  # OSC 8 ; params ; URI ST <name> OSC 8 ;; ST
+  escape_mask = "\033]8;{};{}\033\\{}\033]8;;\033\\"
+
+  return escape_mask.format(parameters, uri, label)

@@ -23,7 +23,13 @@ from importlib import metadata
 import dotenv
 
 from ohcrn_lei import task_parser
-from ohcrn_lei.cli import die, get_dotenv_file, process_cli_args, prompt_for_api_key
+from ohcrn_lei.cli import (
+  die,
+  get_dotenv_file,
+  link,
+  process_cli_args,
+  prompt_for_api_key,
+)
 
 
 def start() -> None:
@@ -31,10 +37,11 @@ def start() -> None:
   # print license header
   print(
     f"""
-OHCRN-LEI {metadata.version("ohcrn_lei")} Copyright (C) 2025  Ontario Institute for Cancer Research
+🌺🌺🌺 OHCRN-LEI 🌺🌺🌺 v{metadata.version("ohcrn_lei")}
+Copyright © 2025  Ontario Institute for Cancer Research
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
-under certain conditions.
+under certain conditions. {link("https://www.gnu.org/licenses/gpl-3.0.txt", "See license for details")}.
 """
   )
 
