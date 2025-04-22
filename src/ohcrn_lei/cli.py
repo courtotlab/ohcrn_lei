@@ -16,8 +16,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import os
+import shutil
 import sys
 from argparse import ArgumentParser, Namespace
+from importlib import metadata
 from pathlib import Path
 
 import dotenv
@@ -74,6 +76,9 @@ def process_cli_args() -> tuple[ArgumentParser, Namespace]:
   """
   parser = ArgumentParser(description="Extract data from report file.")
   parser.add_argument(
+    "--version", action="version", version=f"ohcrn-lei {metadata.version('ohcrn_lei')}"
+  )
+  parser.add_argument(
     "-b",
     "--page-batch",
     type=int,
@@ -86,9 +91,9 @@ def process_cli_args() -> tuple[ArgumentParser, Namespace]:
     type=str,
     default="report",
     help="Specify the extraction task. This can either be a "
-    "pre-defined task ('report','molecular_test','variant')"
-    "or a plain *.txt file with a task definition. See documentation"
-    "for the task definition file format specification."
+    "pre-defined task ('report','molecular_test','variant') "
+    "or a plain *.txt file with a task definition. See documentation "
+    "for the task definition file format specification. "
     "Default: report",
   )
   parser.add_argument(
@@ -107,3 +112,33 @@ def process_cli_args() -> tuple[ArgumentParser, Namespace]:
   parser.add_argument("filename", type=str, help="Path to the report file to process.")
   args = parser.parse_args()
   return parser, args
+
+
+def link(uri: str, label: (str | None) = None) -> str:
+  """Creates an XTerm-compatible hyperlink
+
+  Args:
+    uri: the link target
+    label: The visible text for the link
+
+  Returns:
+    The terminal control code for the hyperlink
+  """
+  if label is None:
+    label = uri
+  parameters = ""
+
+  # OSC 8 ; params ; URI ST <name> OSC 8 ;; ST
+  escape_mask = "\033]8;{};{}\033\\{}\033]8;;\033\\"
+
+  return escape_mask.format(parameters, uri, label)
+
+
+def is_poppler_installed() -> bool:
+  """Checks if poppler-utils is installed.
+
+  Returns:
+    Boolean indicating whether poppler-utils is installed.
+  """
+  binaries = ["pdftocairo", "pdftoppm"]
+  return any(shutil.which(bin) for bin in binaries)

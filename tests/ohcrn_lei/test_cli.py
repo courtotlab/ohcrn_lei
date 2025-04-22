@@ -21,7 +21,13 @@ from pathlib import Path
 import dotenv
 import pytest
 
-from ohcrn_lei.cli import get_dotenv_file, process_cli_args, prompt_for_api_key
+from ohcrn_lei.cli import (
+  get_dotenv_file,
+  is_poppler_installed,
+  link,
+  process_cli_args,
+  prompt_for_api_key,
+)
 
 
 def test_process_cli_args_noArgs():
@@ -52,3 +58,25 @@ def test_prompt_for_api_key(monkeypatch, tmp_path):
   prompt_for_api_key()
   dotenv.load_dotenv(dotenv_file, override=True)
   assert os.getenv("OPENAI_API_KEY") == fake_key
+
+
+def test_link():
+  expected = "\x1b]8;;http://localhost\x1b\\test\x1b]8;;\x1b\\"
+  out = link("http://localhost", "test")
+  assert out == expected
+
+
+def test_is_poppler_installed(monkeypatch):
+  def fake_which(cmd):
+    if cmd == "pdftocairo":
+      return "/this/is/a/path"
+    else:
+      return ""
+
+  monkeypatch.setattr("ohcrn_lei.cli.shutil.which", fake_which)
+  assert is_poppler_installed()
+
+
+def test_is_poppler_installed_fails(monkeypatch):
+  monkeypatch.setattr("ohcrn_lei.cli.shutil.which", lambda cmd: "")
+  assert not is_poppler_installed()
